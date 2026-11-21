@@ -1,0 +1,1127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GMC Style Tile v0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500..800&family=Roboto+Flex:opsz,wght@8..144,400..700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== Tokens (2_design/2.0_tokens.md) ===== */
+:root{
+  --c-green:#0F3B00; --c-red:#990000; --c-yellow:#FFBB00;
+  --c-bg:#F7F7F7; --c-orn:#E3E3E3; --c-white:#FFFFFF;
+  --c-text:#0F3B00; --c-muted:#4a5a44; --c-line:rgba(15,59,0,.14);
+  --f-head:"Archivo","Arial Narrow",Arial,sans-serif;
+  --f-body:"Roboto Flex",system-ui,sans-serif;
+  --f-mono:"Roboto Mono",ui-monospace,monospace;
+  /* type scale, after the reference: 57.6 / 38.4 / 33.8 / 17 */
+  --fs-h1:clamp(2.4rem,4.4vw,3.6rem);
+  --fs-h2:clamp(1.8rem,2.8vw,2.4rem);
+  --fs-h3:clamp(1.5rem,2.2vw,2.1rem);
+  --fs-body:1.0625rem;
+  --fs-small:.875rem;
+  --radius-card:24px; --radius-pill:999px;
+  --shadow-card:0 24px 64px -12px rgba(15,59,0,.16);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.06'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--c-text);font:400 var(--fs-body)/1.6 var(--f-body);
+  background-color:var(--c-bg);
+  /* dot matrix background: --c-orn dots on --c-bg, 20px grid */
+  background-image:radial-gradient(circle at 1px 1px,var(--c-orn) 1.2px,transparent 1.8px);
+  background-size:20px 20px;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:var(--f-head);font-weight:650;letter-spacing:-.012em;margin:0 0 .5em}
+h1{font-size:var(--fs-h1);line-height:1.04}
+h2{font-size:var(--fs-h2);line-height:1.1}
+h3{font-size:var(--fs-h3);line-height:1.05}
+p{margin:0 0 1em}
+a{color:var(--c-red)}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+.label{font:500 .75rem/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--c-red)}
+.muted{color:var(--c-muted)}
+
+/* ===== Header (B0): full-width bar, always solid green (no transparency) ===== */
+.site-header{position:sticky;top:0;z-index:30;width:100%;
+  background:var(--c-green);border-bottom:1px solid rgba(255,255,255,.1);
+  box-shadow:0 10px 30px -18px rgba(0,0,0,.45)}
+.site-header .bar{max-width:1240px;margin:0 auto;padding:0 32px;height:72px;
+  display:flex;align-items:center;justify-content:space-between;color:#fff}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font:650 1rem var(--f-head);letter-spacing:.06em}
+.site-header nav{display:flex;gap:26px;align-items:center}
+.site-header nav a{color:rgba(255,255,255,.82);text-decoration:none;font-size:.94rem}
+.site-header nav a:hover{color:#fff}
+.site-header nav a.pill--accent,.dark a.pill--accent{color:var(--c-green)}
+
+/* ===== Buttons / chips ===== */
+.pill{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 22px;border-radius:var(--radius-pill);
+  font:500 1rem var(--f-body);text-decoration:none;transition:transform .2s var(--ease-out),background .2s}
+.pill:hover{transform:translateY(-1px)}
+.pill--primary{background:var(--c-green);color:#fff}
+.pill--accent{background:var(--c-yellow);color:var(--c-green)}
+.pill--ghost{border:1px solid var(--c-line);color:var(--c-green);background:rgba(255,255,255,.6)}
+.pill--ghost-dark{border:1px solid rgba(255,255,255,.3);color:#fff}
+.chip{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:var(--radius-pill);
+  font:500 .8125rem/1 var(--f-body);letter-spacing:.01em;background:var(--c-green);color:var(--c-yellow);white-space:nowrap}
+.chip--red{background:var(--c-red);color:#fff}
+.chip--line{background:transparent;border:1px solid var(--c-line);color:var(--c-green)}
+
+/* ===== Hero (B1): dark green, 100vh ===== */
+#hero{min-height:calc(100svh - 72px);background:var(--c-green);color:#fff;display:flex;align-items:center;position:relative;overflow:hidden}
+#hero::before{content:"";position:absolute;inset:0;
+  background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.07) 1.2px,transparent 1.8px);background-size:20px 20px}
+#hero .wrap{position:relative;display:grid;grid-template-columns:45fr 55fr;gap:56px;align-items:center;width:100%}
+#hero h1{color:#fff}
+#hero h1 .accent{color:var(--c-yellow);display:block}
+#hero .rule{width:56px;height:3px;background:var(--c-yellow);margin:28px 0}
+#hero .sub{font-size:1.25rem;line-height:1.55;color:rgba(255,255,255,.86);max-width:30em}
+#hero .down{display:inline-flex;gap:8px;margin-top:18px;color:var(--c-yellow);text-decoration:none;font-weight:500}
+.media{aspect-ratio:1/1;border-radius:28px;position:relative;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 70%,#2a5a17 0%,#163f05 45%,var(--c-green) 75%);
+  -webkit-mask-image:radial-gradient(closest-side,#000 78%,transparent 100%);mask-image:radial-gradient(closest-side,#000 78%,transparent 100%)}
+.media svg{position:absolute;inset:0;width:100%;height:100%}
+.media .cap{position:absolute;left:50%;bottom:16%;transform:translateX(-50%);font:500 .7rem var(--f-mono);letter-spacing:.14em;color:rgba(255,255,255,.55);text-transform:uppercase}
+
+/* ===== Sections ===== */
+/* common properties of every page section */
+.sections{padding:60px 0;position:relative}
+.split{display:grid;grid-template-columns:5fr 7fr;gap:72px;align-items:start}
+.split h2{position:sticky;top:110px}
+.intro{max-width:34em;font-size:1.125rem}
+
+/* ===== Card (after .loc.mat) ===== */
+.card{background:#EFEFEF var(--noise);border:1px solid var(--c-line);border-radius:var(--radius-card);
+  box-shadow:var(--shadow-card);padding:36px}
+.card + .card{margin-top:24px}
+.card__row{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:10px}
+.card__row h3{margin:0}
+.card hr{border:0;border-top:1px solid var(--c-line);margin:22px 0}
+.card .meta{font:400 .8125rem/1.5 var(--f-mono);color:var(--c-muted)}
+.stat{display:flex;align-items:baseline;gap:8px;font:650 2.6rem/1 var(--f-head);letter-spacing:-.02em}
+.stat small{font:500 1rem var(--f-body);color:var(--c-muted)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.grid2 .card + .card,.grid3 .card + .card{margin-top:0}
+.status{font:500 .75rem/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;display:block}
+.status.ok{color:var(--c-green)} .status.mid{color:var(--c-red)}
+
+/* ===== B5: four problems — mirrored halves meeting in the centre =====
+   Desktop: left = NOT yet solved (yellow tint), right = SOLVED (green tint).
+   Title split across the halves: "Four problems." (grey, right-aligned, left half)
+   and "Two already solved." (green, left-aligned, right half). */
+:root{
+  --c-green-90:#E7EBE6;  /* green #0F3B00 lightened 90% (mixed with white) */
+  --c-grey:#767676;      /* neutral grey for "Four problems." (3.5:1 on --c-orn, large text) */
+}
+/* unique properties of the B5 section: two-tone background, grey (ornament) left, light green right */
+#problems{background:linear-gradient(90deg,var(--c-orn) 50%,var(--c-green-90) 50%)}
+.problems__grid{display:grid;grid-template-columns:1fr 1fr;column-gap:24px;
+  padding:0 max(32px,calc((100% - 1176px)/2))}
+.problems__label{grid-column:1;grid-row:1;text-align:right;margin-bottom:18px}
+.problems__title{grid-column:1 / -1;grid-row:2;display:grid;grid-template-columns:1fr 1fr;column-gap:24px;
+  font-size:clamp(2.2rem,3.6vw,3.2rem);line-height:1.05;margin:0 0 18px}
+.problems__title .t1{color:var(--c-grey);text-align:right}
+.problems__title .t2{color:var(--c-green);text-align:left}
+.problems__intro{grid-column:2;grid-row:3;text-align:left;margin:0 auto 48px 0;max-width:28em}
+.col{display:flex;flex-direction:column;gap:24px;grid-row:4}
+.col--open{grid-column:1}
+.col--solved{grid-column:2}
+/* card = text half + image half */
+.pcard{display:grid;grid-template-columns:1fr 1fr;min-height:300px;
+  background:#EFEFEF var(--noise);border:1px solid var(--c-line);border-radius:var(--radius-card);
+  box-shadow:var(--shadow-card);overflow:hidden}
+.pcard__text{padding:32px;display:flex;flex-direction:column;align-items:flex-start}
+.pcard__text h3{font-size:clamp(1.4rem,1.9vw,1.75rem)}
+.pcard__text p{font-size:.9688rem;flex:1}
+.pcard__img{position:relative;background:
+  repeating-linear-gradient(135deg,rgba(15,59,0,.07) 0 1px,transparent 1px 12px),#E4E8E2;
+  display:grid;place-items:center}
+.pcard__img span{font:500 .7rem var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--c-muted);
+  background:rgba(255,255,255,.7);padding:6px 10px;border-radius:999px}
+/* images face the centre: left cards text|image, right (solved) cards image|text */
+.col--solved .pcard__img{order:-1}
+.col--open .pcard__img{background:repeating-linear-gradient(135deg,rgba(153,0,0,.07) 0 1px,transparent 1px 12px),#F1ECE0}
+
+/* ===== B2: key figures — one matte card with five cells, count-up on scroll ===== */
+#figures{padding-top:0;margin-top:-56px;z-index:2}
+#hero{padding-bottom:calc(60px + 56px)} /* room for the overlapping figures card */
+.figures{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:#D9DDD6;border:1px solid #D9DDD6;border-radius:var(--radius-card); /* opaque divider colour: no hero green showing through */
+  box-shadow:var(--shadow-card);overflow:hidden}
+.fig{padding:28px 26px 26px;background:#EFEFEF var(--noise)}
+.fig__num{display:flex;align-items:baseline;gap:6px;font:650 clamp(2rem,3.2vw,2.8rem)/1 var(--f-head);letter-spacing:-.02em;color:var(--c-green)}
+.fig__num small{font:500 1rem var(--f-body);color:var(--c-muted);letter-spacing:0}
+.fig__cap{margin-top:10px;font-size:.9375rem;line-height:1.4;color:var(--c-muted)}
+.fig__tag{display:block;margin-bottom:14px;font:500 .6875rem/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--c-red)}
+
+/* ===== B3: concept "power in, heat out" — animated line-art SVG ===== */
+:root{
+  --c-energy:#1F6FEB; /* functional colour: electric power flow (blue) */
+  --c-heat:#D7261E;   /* functional colour: heat flow (red, brighter than --c-red for glow) */
+}
+#concept{text-align:center}
+.concept__head h2{margin:16px auto 0;max-width:18em}
+.concept__art{margin:40px auto 0;max-width:1176px}
+.concept__art svg{width:100%;height:auto;display:block;overflow:visible}
+.concept__legend{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;margin-top:18px;
+  font:500 .75rem/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--c-muted)}
+.concept__legend i{display:inline-block;width:22px;height:3px;border-radius:2px;margin-right:10px;vertical-align:middle}
+.concept__text{max-width:40em;margin:36px auto 0;font-size:1.125rem}
+.concept__tagline{margin-top:18px;font:650 clamp(1.25rem,2vw,1.6rem)/1.2 var(--f-head);color:var(--c-green)}
+.concept__tagline span{color:var(--c-red)}
+/* svg parts */
+.art-line{fill:none;stroke:var(--c-green);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.art-thin{fill:none;stroke:var(--c-green);stroke-width:1.2;opacity:.55}
+.art-fill{fill:#EFEFEF;stroke:var(--c-green);stroke-width:2}
+.art-ground{stroke:var(--c-green);stroke-width:1.5;opacity:.35}
+.art-label{font:500 13px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;fill:var(--c-muted)}
+.wire{fill:none;stroke:var(--c-green);stroke-width:1.6;opacity:.45}
+.pipe{fill:none;stroke:var(--c-green);stroke-width:7;stroke-linecap:round;opacity:.18}
+.flow{fill:none;stroke-linecap:round;animation:flow 1.1s linear infinite}
+.flow--energy{stroke:var(--c-energy);stroke-width:3;stroke-dasharray:3 17;filter:drop-shadow(0 0 3px var(--c-energy))}
+.flow--heat{stroke:var(--c-heat);stroke-width:4;stroke-dasharray:6 14;animation-duration:1.6s;filter:drop-shadow(0 0 3px var(--c-heat))}
+.flow--return{stroke:var(--c-heat);stroke-width:3;stroke-dasharray:4 16;opacity:.35;animation-duration:1.6s;animation-direction:reverse}
+@keyframes flow{to{stroke-dashoffset:-20}}
+.dc-core{fill:var(--c-energy);opacity:.12;animation:pulse 2.4s ease-in-out infinite}
+.win{fill:var(--c-yellow);opacity:.25;animation:glow 3s ease-in-out infinite}
+.win:nth-of-type(2n){animation-delay:.8s}.win:nth-of-type(3n){animation-delay:1.6s}
+@keyframes pulse{50%{opacity:.28}}
+@keyframes glow{50%{opacity:.85}}
+@media (prefers-reduced-motion:reduce){.flow,.dc-core,.win{animation:none}}
+@media (max-width:700px){.art-label{display:none}}
+
+/* ===== B4: why a data center — dark section, EU image + card with ranking ===== */
+#why .why__head{max-width:46em}
+#why .why__head h2{margin-top:16px}
+.why__grid{display:grid;grid-template-columns:5fr 7fr;gap:32px;margin-top:40px;align-items:start}
+.why__img{position:sticky;top:96px;aspect-ratio:1/1;border-radius:var(--radius-card);overflow:hidden;
+  background:#003399;box-shadow:0 24px 64px -20px rgba(0,0,0,.5)}
+.why__img svg{width:100%;height:100%;display:block}
+.why__img figcaption{position:absolute;left:16px;bottom:14px;font:500 .6875rem var(--f-mono);letter-spacing:.12em;
+  text-transform:uppercase;color:rgba(255,255,255,.6)}
+.why__card{padding:36px}
+.why__card p{color:rgba(255,255,255,.82)}
+.why__card h3{color:#fff;margin-top:8px}
+.why__facts{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:10px}
+.why__facts li{padding-left:22px;position:relative;color:rgba(255,255,255,.82)}
+.why__facts li::before{content:"";position:absolute;left:0;top:.7em;width:10px;height:2px;background:var(--c-yellow)}
+.rank{margin-top:30px;border-top:1px solid rgba(255,255,255,.14);padding-top:22px}
+.rank__title{font:500 .75rem/1.5 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--c-yellow);margin-bottom:14px}
+.rank ol{list-style:none;padding:0;margin:0}
+.rank li{display:grid;grid-template-columns:28px 1fr 64px;gap:4px 12px;align-items:center;padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,.07)}
+.rank__n{font:500 .8125rem var(--f-mono);color:rgba(255,255,255,.5)}
+.rank__name{font-size:.9375rem;color:#fff;line-height:1.3}
+.rank__name small{color:rgba(255,255,255,.55);font-size:.8125rem;margin-left:6px}
+.rank__mw{font:650 1rem var(--f-head);text-align:right;color:#fff}
+.rank__bar{grid-column:2 / 4;height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+.rank__bar i{display:block;height:100%;width:var(--w);background:var(--c-yellow);border-radius:2px}
+.rank li.rank__gap{display:block;text-align:center;color:rgba(255,255,255,.4);padding:6px 0;letter-spacing:.3em;border-bottom:0}
+/* our future data center: grey, pulsing */
+.rank li.is-gmc{border:1px dashed rgba(255,255,255,.35);border-radius:12px;padding:10px 12px;margin-top:4px;
+  animation:gmcPulse 2.2s ease-in-out infinite}
+.rank li.is-gmc .rank__name,.rank li.is-gmc .rank__mw{color:#C9C9C9}
+.rank li.is-gmc .rank__bar i{background:#9E9E9E}
+@keyframes gmcPulse{50%{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.6)}}
+@media (prefers-reduced-motion:reduce){.rank li.is-gmc{animation:none}}
+.rank__note{margin-top:14px;font:400 .75rem/1.5 var(--f-mono);color:rgba(255,255,255,.5)}
+@media (max-width:1000px){
+  .why__grid{grid-template-columns:1fr}
+  .why__img{position:relative;top:auto;max-width:420px;width:100%;aspect-ratio:16/10}
+  .why__img.why__map{aspect-ratio:auto;max-width:460px;margin:0 auto !important}
+}
+@media (max-width:560px){.why__card{padding:24px}}
+
+/* B4 map of the Baltic states (replaces the EU flag) */
+.why__img.why__map{aspect-ratio:auto;background:none;box-shadow:none;overflow:visible;border-radius:0}
+.bmap{width:100%;height:auto;display:block;
+  /* soft fade on all four edges, so the clipped neighbours do not form a hard rectangle */
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%),linear-gradient(180deg,transparent 0,#000 5%,#000 95%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%),linear-gradient(180deg,transparent 0,#000 5%,#000 95%,transparent 100%);
+  mask-composite:intersect}
+/* the caption sits under the map (the flag version had an absolute, uppercase caption) */
+.why__img.why__map figcaption{position:static;left:auto;bottom:auto;text-transform:none;letter-spacing:normal;font:inherit;color:rgba(255,255,255,.65)}
+.why__img.why__map figcaption.map-cap{margin-top:14px;display:grid;gap:8px}
+.map-c{stroke:var(--c-green);stroke-width:1;stroke-linejoin:round}
+.map-c--ctx{fill:rgba(255,255,255,.05)}
+.map-c--ee,.map-c--lv{fill:rgba(255,255,255,.16)}
+.map-c--lt{fill:rgba(255,255,255,.26)}
+.map-cn{font:500 13px var(--f-mono);letter-spacing:.2em;fill:rgba(255,255,255,.45);text-anchor:middle}
+.map-l{font:500 13px var(--f-body);fill:rgba(255,255,255,.85)}
+.map-l--end{text-anchor:end}
+.map-l--gmc{font:650 16px var(--f-head);fill:var(--c-yellow);text-anchor:middle}
+.map-l--gmc tspan + tspan{font:500 13px var(--f-mono);fill:rgba(255,255,255,.85)}
+.dc circle{stroke-width:1.5}
+.dc--op circle{fill:rgba(255,255,255,.85);stroke:#fff}
+.dc--build circle{fill:none;stroke:rgba(255,255,255,.8);stroke-dasharray:3 3}
+.dc--gmc circle{fill:rgba(255,187,0,.35);stroke:var(--c-yellow);stroke-width:2;stroke-dasharray:6 4}
+.dc--gmc .dc__pulse{fill:var(--c-yellow);stroke:none;opacity:.35;transform-box:fill-box;transform-origin:center;animation:mapPulse 2.4s ease-out infinite}
+@keyframes mapPulse{0%{transform:scale(1);opacity:.45}100%{transform:scale(1.9);opacity:0}}
+@media (prefers-reduced-motion:reduce){.dc--gmc .dc__pulse{animation:none;opacity:0}}
+.map-cap{margin-top:14px;display:grid;gap:8px;font-size:.875rem;color:rgba(255,255,255,.65)}
+.map-cap strong{font:650 1.125rem/1.3 var(--f-head);color:#fff}
+.map-cap span{font-size:.8125rem;line-height:1.5}
+.map-legend{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font:500 .6875rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase}
+.lgi{white-space:nowrap}
+.lg{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:4px;vertical-align:-2px}
+.lg--op{background:rgba(255,255,255,.85)}
+.lg--build{border:1.5px dashed rgba(255,255,255,.8)}
+.lg--gmc{background:rgba(255,187,0,.35);border:2px solid var(--c-yellow)}
+
+/* ===== B6: the site — schematic + feature list (light section) ===== */
+#site .site__head{max-width:46em}
+#site .site__head h2{margin-top:16px}
+#site .site__head p{margin-top:12px}
+.site__grid{display:grid;grid-template-columns:6fr 6fr;gap:32px;margin-top:40px;align-items:start}
+.site__schem{padding:20px;position:sticky;top:96px}
+.site__schem svg{width:100%;height:auto;display:block}
+.site__schem figcaption{margin-top:10px;font:400 .75rem var(--f-mono);color:var(--c-muted);letter-spacing:.04em}
+.sch-lake{fill:#DCE6EC}
+.sch-wave{fill:none;stroke:#9DB4C2;stroke-width:1.2;stroke-linecap:round}
+.sch-plot{fill:var(--c-green-90);stroke:var(--c-green);stroke-width:2}
+.sch-hatch{stroke:var(--c-green);stroke-width:1;opacity:.18}
+.sch-yard{fill:#EFEFEF;stroke:var(--c-green);stroke-width:2}
+.sch-yard-l{stroke:var(--c-green);stroke-width:1.2;opacity:.6}
+.sch-fence{stroke:var(--c-red);stroke-width:4;stroke-linecap:round}
+.sch-power{fill:none;stroke:var(--c-energy);stroke-width:2.5;stroke-dasharray:3 9;animation:flow 1.1s linear infinite}
+.sch-heat{fill:none;stroke:var(--c-heat);stroke-width:2.5;stroke-dasharray:6 8;animation:flow 1.6s linear infinite}
+.sch-fibre{fill:none;stroke:var(--c-yellow);stroke-width:2.5;stroke-dasharray:2 8;animation:flow 1s linear infinite}
+.sch-t{font:500 12px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;fill:var(--c-green)}
+.sch-t--m{fill:var(--c-muted)}
+.sch-t--big{font:650 18px var(--f-head);letter-spacing:0;text-transform:none}
+.sch-t--red{fill:var(--c-red)}
+@media (prefers-reduced-motion:reduce){.sch-power,.sch-heat,.sch-fibre{animation:none}}
+.feats{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.feats .card + .card{margin-top:0}
+.sch-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px}
+.sch-legend span{white-space:nowrap}
+.sch-legend i{display:inline-block;width:18px;height:0;border-top:2.5px dashed;margin-right:6px;vertical-align:middle}
+.feat{padding:24px}
+.feat .status{margin-bottom:10px}
+.feat h3{font-size:1.25rem;margin-bottom:8px}
+.feat p{font-size:.9375rem;color:var(--c-muted);margin:0}
+.feat .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;margin-bottom:14px;background:var(--c-green-90);color:var(--c-green)}
+@media (max-width:1000px){
+  .site__grid{grid-template-columns:1fr}
+  .site__schem{position:static}
+}
+@media (max-width:560px){.feats{grid-template-columns:1fr}.feat{padding:20px}}
+
+/* ===== B7: heat for the town — season switch (winter / summer) ===== */
+#heat{background:var(--c-green-90)}
+#heat .heat__head{text-align:center;max-width:44em;margin:0 auto}
+#heat .heat__head h2{margin-top:16px}
+.season{display:inline-flex;gap:4px;margin:28px auto 0;padding:4px;border-radius:999px;background:#fff;border:1px solid var(--c-line)}
+.season__wrap{text-align:center}
+.season button{appearance:none;border:0;background:transparent;font:500 .9375rem var(--f-body);color:var(--c-green);
+  padding:10px 20px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.season button[aria-pressed="true"]{background:var(--c-green);color:#fff}
+.season button:focus-visible{outline:2px solid var(--c-red);outline-offset:2px}
+.heat__art{margin:28px auto 0;max-width:1100px;padding:20px;position:relative;overflow:hidden;isolation:isolate}
+.heat__art::before,.heat__art::after{content:"";position:absolute;inset:0;z-index:-1;transition:opacity .6s ease}
+.heat__art::before{background:linear-gradient(180deg,#5A6685 0%,#A7ADC8 100%)} /* winter */
+.heat__art::after{background:linear-gradient(180deg,#FFDE92 0%,#DFFFBF 100%)}  /* summer */
+#heat[data-season="winter"] .heat__art::before{opacity:1} #heat[data-season="winter"] .heat__art::after{opacity:0}
+#heat[data-season="summer"] .heat__art::before{opacity:0} #heat[data-season="summer"] .heat__art::after{opacity:1}
+.heat__art svg{width:100%;height:auto;display:block}
+/* winter sky is dark at the top: light strokes / labels up there */
+.h-t--top,.snow .h-line{transition:fill .6s,stroke .6s}
+#heat[data-season="winter"] .h-t--top{fill:#fff}
+#heat[data-season="winter"] .snow .h-line{stroke:#fff}
+.heat__note{max-width:40em;margin:22px auto 0;text-align:center;font-size:1.0625rem}
+.heat__note [data-s]{display:none}
+#heat[data-season="winter"] .heat__note [data-s="winter"],#heat[data-season="summer"] .heat__note [data-s="summer"]{display:block}
+.heat__pts{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:36px}
+.heat__pts .card + .card{margin-top:0}
+.heat__pts .feat h3{font-size:1.125rem}
+/* svg */
+.h-line{fill:none;stroke:var(--c-green);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.h-thin{fill:none;stroke:var(--c-green);stroke-width:1.2;opacity:.5}
+.h-fill{fill:#F7F7F7;stroke:var(--c-green);stroke-width:2}
+.h-ground{stroke:var(--c-green);stroke-width:1.5;opacity:.3}
+.h-pipe{fill:none;stroke:var(--c-green);stroke-width:7;stroke-linecap:round;opacity:.14}
+.h-t{font:500 12px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;fill:var(--c-green)}
+.h-lake{fill:#DCE6EC}.h-wave{fill:none;stroke:#9DB4C2;stroke-width:1.2;stroke-linecap:round}
+.f-town,.f-cool{fill:none;stroke-linecap:round;animation:flow 1.4s linear infinite;transition:opacity .5s,stroke-width .5s}
+.f-town{stroke:var(--c-heat);stroke-dasharray:6 14;filter:drop-shadow(0 0 3px var(--c-heat))}
+.f-cool{stroke:#FF8A3D;stroke-dasharray:5 15}
+.haze{fill:none;stroke:#FF8A3D;stroke-width:2;stroke-linecap:round;transition:opacity .5s;animation:rise 2s ease-in-out infinite}
+.haze:nth-of-type(2){animation-delay:.6s}.haze:nth-of-type(3){animation-delay:1.2s}
+@keyframes rise{0%{transform:translateY(6px);opacity:0}50%{opacity:.9}100%{transform:translateY(-14px);opacity:0}}
+.fan{transform-box:fill-box;transform-origin:center;animation:spin 1.2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hwin{fill:var(--c-yellow);transition:opacity .5s}
+.sun,.snow{transition:opacity .5s}
+/* winter */
+#heat[data-season="winter"] .f-town{opacity:1;stroke-width:5}
+#heat[data-season="winter"] .f-cool{opacity:.12;stroke-width:3}
+#heat[data-season="winter"] .haze{opacity:0;animation:none}
+#heat[data-season="winter"] .fan{animation-duration:4s}
+#heat[data-season="winter"] .hwin{opacity:.85}
+#heat[data-season="winter"] .sun{opacity:0}
+#heat[data-season="winter"] .snow{opacity:1}
+/* summer */
+#heat[data-season="summer"] .f-town{opacity:.55;stroke-width:2.5}
+#heat[data-season="summer"] .f-cool{opacity:1;stroke-width:5}
+#heat[data-season="summer"] .fan{animation-duration:.6s}
+#heat[data-season="summer"] .hwin{opacity:.2}
+#heat[data-season="summer"] .sun{opacity:1}
+#heat[data-season="summer"] .snow{opacity:0}
+@media (prefers-reduced-motion:reduce){.f-town,.f-cool,.haze,.fan{animation:none}}
+@media (max-width:1000px){.heat__pts{grid-template-columns:1fr 1fr}}
+@media (max-width:700px){.h-t{display:none}}
+@media (max-width:560px){.heat__pts{grid-template-columns:1fr}.heat__art{padding:12px}}
+
+/* ===== B8: a second life for a nuclear site — dark, timeline + legacy cards ===== */
+#legacy .legacy__head{max-width:46em}
+#legacy .legacy__head h2{margin-top:16px}
+#legacy .legacy__head h2 .accent{white-space:nowrap}
+#legacy .legacy__head p{margin-top:14px;color:rgba(255,255,255,.78)}
+.tl{list-style:none;margin:48px 0 0;padding:0;display:grid;grid-template-columns:repeat(7,1fr);position:relative}
+.tl li{position:relative;padding:34px 14px 0 0}
+.tl li::before{content:"";position:absolute;left:0;top:2px;width:16px;height:16px;border-radius:50%;z-index:1;
+  background:var(--c-green);border:2px solid rgba(255,255,255,.7)}
+/* segment from this dot to the next one */
+.tl li::after{content:"";position:absolute;left:8px;right:-8px;top:9px;height:2px;background:rgba(255,255,255,.35)}
+/* 2009 → 2026: dashed, shimmering: the old plant fading out */
+.tl li:nth-child(5)::after{background:repeating-linear-gradient(90deg,rgba(255,255,255,.55) 0 6px,transparent 6px 13px);
+  animation:decay 3.2s ease-in-out infinite, dashes 2.4s linear infinite}
+/* 2026 → Next: dashed, gradient white → yellow */
+.tl li:nth-child(6)::after{background:linear-gradient(90deg,rgba(255,255,255,.55),var(--c-yellow));
+  -webkit-mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 13px);mask:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 13px)}
+/* after Next: solid yellow to the edge */
+.tl li:nth-child(7)::after{right:0;background:var(--c-yellow)}
+@keyframes decay{0%,100%{opacity:.75}18%{opacity:.25}30%{opacity:.6}46%{opacity:.12}62%{opacity:.5}80%{opacity:.2}}
+@keyframes dashes{to{background-position:26px 0}}
+@media (prefers-reduced-motion:reduce){.tl li:nth-child(5)::after{animation:none;opacity:.4}}
+.tl__y{display:block;font:650 1.375rem/1 var(--f-head);color:#fff;margin-bottom:8px}
+.tl__t{font-size:.875rem;line-height:1.45;color:rgba(255,255,255,.72)}
+.tl li.is-now::before{background:var(--c-yellow);border-color:var(--c-yellow)}
+.tl li.is-now .tl__y{color:var(--c-yellow)}
+.tl li.is-next::before{background:transparent;border:2px dashed var(--c-yellow);animation:gmcPulse 2.2s ease-in-out infinite}
+.tl li.is-next .tl__y{color:var(--c-yellow)}
+.legacy__sub{margin:56px 0 18px;font:500 .75rem/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--c-yellow)}
+.legacy__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.legacy__grid .card + .card{margin-top:0}
+.legacy__grid .card{padding:24px}
+.legacy__grid h3{font-size:1.125rem;color:#fff;margin:12px 0 8px}
+.legacy__grid p{font-size:.875rem;color:rgba(255,255,255,.72);margin:0}
+.legacy__grid .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:rgba(255,187,0,.14);color:var(--c-yellow)}
+.legacy__note{margin-top:18px;font:400 .75rem/1.5 var(--f-mono);color:rgba(255,255,255,.45)}
+@media (max-width:1000px){
+  .tl{grid-template-columns:1fr;margin-left:8px}
+  .tl li{padding:0 0 22px 34px}
+  .tl li::before{top:2px}
+  .tl li::after{left:7px;right:auto;top:10px;bottom:-10px;width:2px;height:auto}
+  .tl li:nth-child(5)::after{background:repeating-linear-gradient(180deg,rgba(255,255,255,.55) 0 6px,transparent 6px 13px)}
+  .tl li:nth-child(6)::after{background:linear-gradient(180deg,rgba(255,255,255,.55),var(--c-yellow));
+    -webkit-mask:repeating-linear-gradient(180deg,#000 0 6px,transparent 6px 13px);mask:repeating-linear-gradient(180deg,#000 0 6px,transparent 6px 13px)}
+  .tl li:nth-child(7)::after{bottom:0}
+  @keyframes dashes{to{background-position:0 26px}}
+  .legacy__grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){.legacy__grid{grid-template-columns:1fr}#legacy .legacy__head h2 .accent{white-space:normal}}
+
+/* ===== B10: status & roadmap — Done / Now / Next board (light) ===== */
+#status .status__head{max-width:46em}
+#status .status__head h2{margin-top:16px}
+.board{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:24px;margin-top:40px;align-items:center}
+.board__col{border-radius:var(--radius-card);padding:20px;min-height:100%}
+.board__col--done{background:var(--c-green-90)}
+.board__col--now{background:#fff;border:2px solid var(--c-red);padding:28px 26px;box-shadow:0 30px 70px -24px rgba(153,0,0,.25)}
+.board__col--now .board__h b{font-size:1.5rem}
+.board__cta{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:18px;padding:16px 20px;border-radius:999px;background:var(--c-red);color:#fff;text-decoration:none;font:600 1rem/1.3 var(--f-body);text-align:center;transition:transform .2s var(--ease-out),background .2s}
+.board__cta:hover{transform:translateY(-1px);background:#7d0000}
+.board__cta:focus-visible{outline:2px solid var(--c-green);outline-offset:3px}
+.board__col--next{background:var(--c-orn)}
+.board__h{display:flex;align-items:center;justify-content:space-between;margin:4px 4px 16px}
+.board__h b{font:650 1.25rem var(--f-head);color:var(--c-green)}
+.board__h span{font:500 .75rem/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase}
+.board__col--done .board__h span{color:var(--c-green)}
+.board__col--now .board__h span{color:var(--c-red)}
+.board__col--next .board__h span{color:var(--c-muted)}
+.task{background:#EFEFEF var(--noise);border:1px solid var(--c-line);border-radius:16px;padding:16px 18px;margin-top:12px;
+  box-shadow:0 10px 24px -16px rgba(15,59,0,.25)}
+.task h3{font-size:1.0625rem;margin:0 0 4px}
+.task p{font-size:.875rem;color:var(--c-muted);margin:0}
+.task__tag{display:inline-block;margin-bottom:8px;font:500 .6875rem/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
+.board__col--done .task__tag{color:var(--c-green)}
+.board__col--now .task__tag{color:var(--c-red)}
+.board__col--next .task__tag{color:var(--c-muted)}
+.board__col--now .task{border-color:rgba(153,0,0,.25)}
+.board__col--next .task{opacity:.85}
+@media (max-width:1000px){.board{grid-template-columns:1fr}}
+
+/* ===== B11: investment opportunity (light) ===== */
+#invest .invest__head{max-width:46em}
+#invest .invest__head h2{margin-top:16px}
+.invest__sub{margin:44px 0 16px;font:500 .75rem/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--c-red)}
+.ways{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.ways .card + .card{margin-top:0}
+.way{padding:28px}
+.way h3{font-size:1.375rem;margin:10px 0 8px}
+.way p{color:var(--c-muted);font-size:.9688rem;margin:0}
+.invest__two{display:grid;grid-template-columns:7fr 5fr;gap:24px;margin-top:8px;align-items:start}
+.gets{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.gets li{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start;padding:16px 18px;border-radius:16px;background:#EFEFEF var(--noise);border:1px solid var(--c-line)}
+.gets li i{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:var(--c-green);color:var(--c-yellow);font-style:normal;font-weight:700}
+.gets b{display:block;color:var(--c-green);margin-bottom:2px}
+.gets span{color:var(--c-muted);font-size:.9375rem}
+.whom{padding:24px}
+.whom ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:10px}
+.whom li{padding:10px 14px;border-radius:999px;border:1px solid var(--c-line);background:#fff;font-size:.9375rem;color:var(--c-green)}
+.invest__cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+@media (max-width:1000px){.ways{grid-template-columns:1fr}.invest__two{grid-template-columns:1fr}.board{grid-template-columns:1fr}}
+
+/* reveal on scroll ("is-in") */
+.reveal{opacity:0;translate:0 24px;scale:.985;transition:opacity .7s var(--ease-out),translate .7s var(--ease-out),scale .7s var(--ease-out)}
+.reveal.is-in{opacity:1;translate:0 0;scale:1}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;translate:none;scale:none;transition:none}}
+
+/* ===== Type specimen (section #typography: hidden for now) ===== */
+#typography{display:none}
+.spec{display:grid;grid-template-columns:180px 1fr;gap:18px 32px;align-items:baseline}
+.spec .k{font:400 .8125rem var(--f-mono);color:var(--c-muted)}
+.swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.sw{border-radius:18px;overflow:hidden;border:1px solid var(--c-line);background:#fff}
+.sw i{display:block;height:96px}
+.sw div{padding:12px 14px;font:400 .8125rem/1.5 var(--f-mono)}
+
+/* ===== Dark section / footer (B14) ===== */
+.dark{background:var(--c-green);color:#fff;position:relative}
+.dark::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.07) 1.2px,transparent 1.8px);background-size:20px 20px;pointer-events:none}
+.dark .wrap{position:relative}
+.dark h2 .accent{color:var(--c-yellow)}
+.dark .card{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14);box-shadow:none;color:#fff}
+.dark .muted{color:rgba(255,255,255,.7)}
+.dark a{color:var(--c-yellow)}
+.foot{padding:28px 0 40px;border-top:1px solid rgba(255,255,255,.14);margin-top:72px;font-size:.875rem;color:rgba(255,255,255,.6);display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+
+.tile-note{font:400 .8125rem var(--f-mono);color:var(--c-muted);text-align:center;padding:18px}
+
+@media (max-width:1000px){
+  #hero .wrap,.split{grid-template-columns:1fr;gap:40px}
+  #hero .media{order:-1;max-width:520px;width:100%;margin:0 auto}
+  .split h2{position:static}
+  .grid3{grid-template-columns:1fr 1fr}
+  .swatches{grid-template-columns:repeat(3,1fr)}
+  /* B5 tablet/mobile: one-colour common title, then four identical cards;
+     solved first (as before), each group on its own tint */
+  #problems{background:var(--c-bg);padding-bottom:0}
+  .problems__grid{grid-template-columns:1fr;padding:0}
+  .problems__label,.problems__title,.problems__intro{grid-column:1;grid-row:auto;text-align:center;padding:0 24px}
+  .problems__title{display:block}
+  .problems__title .t1,.problems__title .t2{color:var(--c-green);text-align:center}
+  .problems__intro{margin:0 auto 48px;max-width:36em}
+  .col{grid-column:1 !important;grid-row:auto;padding:56px max(24px,calc((100% - 720px)/2))}
+  .col--solved{order:1;background:var(--c-green-90)}
+  .col--open{order:2;background:var(--c-orn)}
+  .col--solved .pcard__img{order:0}
+}
+@media (max-width:1000px){
+}
+@media (max-width:560px){
+  .figures{grid-template-columns:1fr}
+  .fig{padding:22px 18px}
+  /* B5 cards: image on top, text below */
+  .pcard{grid-template-columns:1fr}
+  .pcard__img{order:-1;min-height:180px}
+  .pcard__text{padding:24px}
+}
+@media (max-width:700px){
+  .wrap{padding:0 16px}
+  .site-header .bar{padding:0 16px;height:64px}
+  .site-header nav a:not(.pill){display:none}
+  .grid3,.grid2{grid-template-columns:1fr}
+  .card{padding:24px}
+  .spec{grid-template-columns:1fr;gap:4px 0}
+  .spec .k{margin-top:14px}
+  .swatches{grid-template-columns:1fr 1fr}
+  .card__row{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<div class="tile-note">GMC style tile v0 · concept for discussion · not the final page</div>
+
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="#">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="10" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="16" cy="16" r="3" fill="#FFBB00"/></svg>
+      GLOBALMIND CENTER
+    </a>
+    <nav aria-label="Main">
+      <a href="#">Concept</a><a href="#">Site</a><a href="#">Heat</a><a href="#">Status</a><a href="#">FAQ</a><a href="#">Partners</a>
+      <a class="pill pill--accent" href="#contact" style="height:40px">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- B1 HERO -->
+<section id="hero" class="sections">
+  <div class="wrap">
+    <div>
+      <span class="label" style="color:var(--c-yellow)">AI-ready data center site · Lithuania</span>
+      <h1 style="margin-top:22px">The power is here.<span class="accent">The future is next.</span></h1>
+      <div class="rule"></div>
+      <p class="sub">120 MW of grid power at the fence of a former nuclear power plant, ready for Europe's AI, with its heat going back to the town.</p>
+      <a class="down" href="#contact">Request investor materials ↓</a>
+    </div>
+    <div class="media" aria-label="Placeholder for the hero video">
+      <svg viewBox="0 0 400 400" fill="none" aria-hidden="true">
+        <g stroke="#FFBB00" stroke-width="1.2" opacity=".9">
+          <ellipse cx="200" cy="300" rx="38" ry="9"/>
+          <ellipse cx="200" cy="250" rx="38" ry="9" opacity=".7"/>
+          <ellipse cx="200" cy="200" rx="38" ry="9" opacity=".6"/>
+          <ellipse cx="200" cy="150" rx="38" ry="9" opacity=".5"/>
+          <ellipse cx="200" cy="100" rx="38" ry="9" opacity=".4"/>
+          <path d="M162 300V100M238 300V100M180 308V108M220 308V108" opacity=".7"/>
+          <path d="M238 300 L320 330 M162 300 L60 318" opacity=".8"/>
+        </g>
+        <path d="M200 309 C 240 340, 300 352, 400 352" stroke="#ff8a3d" stroke-width="2" opacity=".9"/>
+      </svg>
+      <span class="cap">Video placeholder · visualisation</span>
+    </div>
+  </div>
+</section>
+
+<!-- B2: KEY FIGURES -->
+<section id="figures" class="sections" aria-label="Key figures">
+  <div class="wrap">
+    <div class="figures reveal">
+      <div class="fig"><span class="fig__tag">Power</span><div class="fig__num"><span data-count="120">120</span><small>MW</small></div><p class="fig__cap">design grid load, ~100 MW IT</p></div>
+      <div class="fig"><span class="fig__tag">Land</span><div class="fig__num"><span data-count="4">4</span><small>ha</small></div><p class="fig__cap">owned plot, industrial zone</p></div>
+      <div class="fig"><span class="fig__tag">Town</span><div class="fig__num"><span data-count="5">5</span><small>km</small></div><p class="fig__cap">to Visaginas in a straight line, 10 km by road</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- B3: CONCEPT — power in, heat out -->
+<section id="concept" class="sections" aria-labelledby="concept-title">
+  <div class="wrap">
+    <div class="concept__head">
+      <span class="label">The concept</span>
+      <h2 id="concept-title" class="reveal">Power at the fence. Heat for the town.</h2>
+    </div>
+    <figure class="concept__art reveal">
+      <svg viewBox="0 0 1200 450" role="img" aria-labelledby="concept-svg-t concept-svg-d">
+        <title id="concept-svg-t">Power in, heat out</title>
+        <desc id="concept-svg-d">Electric power flows from a high-voltage line into a data center tower. The heat of the servers flows through pipes to the houses of the town.</desc>
+        <line class="art-ground" x1="0" y1="380" x2="1200" y2="380"/>
+
+        <!-- 1. Transmission tower (grid) -->
+        <g>
+          <path class="art-line" d="M95 380 L136 70 M185 380 L144 70 M136 70 L144 70"/>
+          <path class="art-thin" d="M101 335 L180 335 M107 290 L174 290 M113 245 L168 245 M119 200 L162 200 M125 155 L156 155 M131 110 L150 110"/>
+          <path class="art-thin" d="M101 335 L174 290 L113 245 L162 200 L125 155 L150 110 M180 335 L107 290 L168 245 L119 200 L156 155 L131 110"/>
+          <path class="art-line" d="M60 110 L220 110 M78 155 L202 155"/>
+          <path class="art-line" d="M64 110 v14 M216 110 v14 M82 155 v14 M198 155 v14"/>
+          <text class="art-label" x="140" y="440" text-anchor="middle">330 kV grid</text>
+        </g>
+
+        <!-- wires: base + animated energy (from the left edge, through the tower, into the data center) -->
+        <path class="wire" d="M0 150 Q 32 160 64 124"/>
+        <path class="wire" d="M0 190 Q 40 200 82 169"/>
+        <path class="wire" d="M216 124 Q 380 230 540 150"/>
+        <path class="wire" d="M198 169 Q 370 270 540 200"/>
+        <path class="flow flow--energy" d="M0 150 Q 32 160 64 124"/>
+        <path class="flow flow--energy" d="M0 190 Q 40 200 82 169"/>
+        <path class="flow flow--energy" d="M216 124 Q 380 230 540 150"/>
+        <path class="flow flow--energy" d="M198 169 Q 370 270 540 200"/>
+
+        <!-- 2. Data center tower -->
+        <g>
+          <rect class="art-fill" x="540" y="60" width="120" height="320" rx="4"/>
+          <rect class="dc-core" x="552" y="72" width="96" height="296" rx="2"/>
+          <path class="art-thin" d="M540 100 H660 M540 140 H660 M540 180 H660 M540 220 H660 M540 260 H660 M540 300 H660 M540 340 H660 M580 60 V380 M620 60 V380"/>
+          <rect class="art-line" x="556" y="40" width="26" height="20" rx="2"/>
+          <rect class="art-line" x="618" y="40" width="26" height="20" rx="2"/>
+          <path class="art-thin" d="M562 50 H576 M624 50 H638"/>
+          <text class="art-label" x="600" y="440" text-anchor="middle">AI data center</text>
+        </g>
+
+        <!-- 3. Heat exchanger -->
+        <g>
+          <rect class="art-fill" x="676" y="330" width="50" height="50" rx="4"/>
+          <path class="art-thin" d="M686 340 Q 701 355 686 370 M701 340 Q 716 355 701 370"/>
+          <text class="art-label" x="701" y="320" text-anchor="middle">HX</text>
+          <path class="art-line" d="M660 345 H676 M660 365 H676"/>
+        </g>
+
+        <!-- pipes: base + animated heat (supply to town, return back) -->
+        <path class="pipe" d="M726 345 H760 V400 H1180"/>
+        <path class="pipe" d="M726 365 H744 V414 H1180"/>
+        <path class="flow flow--heat" d="M726 345 H760 V400 H1180"/>
+        <path class="flow flow--return" d="M726 365 H744 V414 H1180"/>
+        <path class="art-line" d="M865 400 V380 M955 400 V380 M1040 400 V380 M1125 400 V380"/>
+
+        <!-- 4. Town: houses with warm windows -->
+        <g transform="translate(0 50)">
+          <path class="art-fill" d="M830 330 V260 L865 230 L900 260 V330 Z"/>
+          <rect class="win" x="845" y="275" width="12" height="14"/><rect class="win" x="873" y="275" width="12" height="14"/><rect class="win" x="845" y="300" width="12" height="14"/>
+          <path class="art-fill" d="M915 330 V220 H995 V330 Z"/>
+          <rect class="win" x="928" y="236" width="12" height="14"/><rect class="win" x="949" y="236" width="12" height="14"/><rect class="win" x="970" y="236" width="12" height="14"/>
+          <rect class="win" x="928" y="262" width="12" height="14"/><rect class="win" x="949" y="262" width="12" height="14"/><rect class="win" x="970" y="262" width="12" height="14"/>
+          <rect class="win" x="928" y="288" width="12" height="14"/><rect class="win" x="970" y="288" width="12" height="14"/>
+          <path class="art-fill" d="M1010 330 V270 L1040 245 L1070 270 V330 Z"/>
+          <rect class="win" x="1024" y="285" width="12" height="14"/><rect class="win" x="1046" y="285" width="12" height="14"/>
+          <path class="art-fill" d="M1085 330 V200 H1165 V330 Z"/>
+          <rect class="win" x="1098" y="216" width="12" height="14"/><rect class="win" x="1119" y="216" width="12" height="14"/><rect class="win" x="1140" y="216" width="12" height="14"/>
+          <rect class="win" x="1098" y="242" width="12" height="14"/><rect class="win" x="1140" y="242" width="12" height="14"/>
+          <rect class="win" x="1098" y="268" width="12" height="14"/><rect class="win" x="1119" y="268" width="12" height="14"/><rect class="win" x="1140" y="268" width="12" height="14"/>
+          <text class="art-label" x="1000" y="388" text-anchor="middle">Visaginas</text>
+        </g>
+      </svg>
+      <figcaption class="concept__legend">
+        <span><i style="background:var(--c-energy)"></i>Power in</span>
+        <span><i style="background:var(--c-heat)"></i>Heat out</span>
+      </figcaption>
+    </figure>
+    <p class="concept__text muted reveal">Grid power from the switchyard behind the fence runs the AI servers. Liquid cooling carries their heat away at a usable temperature, and a heat exchanger hands it over to the district-heating network of Visaginas. Energy that would otherwise be wasted warms the homes of the town.</p>
+    <p class="concept__tagline reveal">Cool servers. Warm homes. <span>Efficient by nature.</span></p>
+  </div>
+</section>
+
+<!-- B4: WHY A DATA CENTER — dark -->
+<section id="why" class="sections dark" aria-labelledby="why-title">
+  <div class="wrap">
+    <div class="why__head">
+      <span class="label" style="color:var(--c-yellow)">Why a data center</span>
+      <h2 id="why-title" class="reveal">Europe needs its own <span class="accent">AI capacity.</span></h2>
+    </div>
+    <div class="why__grid">
+      <figure class="why__img why__map reveal" style="margin:0">
+        <svg class="bmap" viewBox="0 0 600 821" role="img" aria-labelledby="bmap-t bmap-d"><title id="bmap-t">Data centers in the Baltic states</title><desc id="bmap-d">Existing data centers in Estonia, Latvia and Lithuania are 31.5 MW or smaller. GlobalMind Center in north-east Lithuania is planned at 120 MW.</desc><path class="map-c map-c--ctx" d="M-45.0 97.6L-45.0 115.0L-45.0 117.2L-45.0 112.7L-45.0 100.0L-45.0 81.0L-45.0 62.9L-45.0 43.6L-45.0 26.6L-45.0 21.6L-45.0 7.2L-45.0 -4.4L-45.0 -15.5L-45.0 -19.3L-45.0 -20.2L-45.0 -22.3L-45.0 -29.7L-45.0 -39.7L-45.0 -48.8L-45.0 -66.9L-45.0 -75.9L-45.0 -82.1L-40.8 -82.1L-27.0 -82.1L-45.0 -82.1L-33.9 -82.1L-27.0 -82.1L-21.0 -82.1L-18.9 -82.1L-19.7 -82.1L-23.8 -82.1L-36.2 -82.1L-8.1 -82.1L1.7 -82.1L22.1 -82.1L23.0 -82.1L23.9 -82.1L43.8 -82.1L49.5 -82.1L61.7 -82.1L64.9 -82.1L76.2 -82.1L84.3 -82.1L93.8 -82.1L104.8 -82.1L119.6 -82.1L132.2 -82.1L163.7 -82.1L169.1 -82.1L178.2 -82.1L187.3 -82.1L193.7 -82.1L203.9 -82.1L206.7 -82.1L215.6 -82.1L227.9 -82.1L217.6 -82.1L216.6 -82.1L217.5 -82.1L220.6 -82.1L217.8 -82.1L214.9 -82.1L213.9 -82.1L215.1 -82.1L220.3 -82.1L229.6 -82.1L235.0 -82.1L238.1 -82.1L237.1 -82.1L229.2 -82.1L227.0 -82.1L228.1 -82.1L230.8 -82.1L236.9 -82.1L245.2 -82.1L250.6 -82.1L253.2 -82.1L254.1 -82.1L250.4 -82.1L247.1 -82.1L244.9 -82.1L237.6 -82.1L232.6 -82.1L231.2 -82.1L232.0 -82.1L234.1 -82.1L236.4 -82.1L248.0 -82.1L254.6 -82.1L258.7 -82.1L266.7 -82.1L246.8 -82.1L231.9 -82.1L224.4 -82.1L211.4 -82.1L196.6 -82.1L191.6 -82.1L187.7 -82.1L174.0 -82.1L161.0 -82.1L151.5 -82.1L145.4 -82.1L139.9 -82.1L135.1 -82.1L132.5 -82.1L130.2 -82.1L126.6 -82.1L125.6 -82.1L124.1 -82.1L111.5 -82.1L112.2 -82.1L115.0 -82.1L116.1 -82.1L111.5 -82.1L99.0 -82.1L97.7 -82.1L101.2 -82.1L98.5 -82.1L96.0 -82.1L81.0 -82.1L72.4 -82.1L69.9 -82.1L70.9 -82.1L74.7 -82.1L76.0 -82.1L72.5 -82.1L63.5 -82.1L60.8 -82.1L62.8 -82.1L68.0 -82.1L70.9 -82.1L73.5 -82.1L61.9 -82.1L52.0 -82.1L44.7 -82.1L40.4 -82.1L45.4 -82.1L50.9 -82.1L54.9 -82.1L59.5 -82.1L69.0 -82.1L67.1 -82.1L64.9 -82.1L49.2 -82.1L31.4 -82.1L12.2 -82.1L5.8 -82.1L-11.0 -82.1L-17.1 -82.1L-29.6 -82.1L-45.0 -82.1L-45.0 -80.3L-45.0 -68.9L-45.0 -55.1L-45.0 -50.5L-45.0 -45.1L-45.0 -37.7L-45.0 -31.5L-45.0 -26.3L-45.0 -10.6L-45.0 -1.0L-45.0 2.3L-45.0 12.7L-45.0 20.4L-45.0 25.2L-45.0 35.5L-45.0 37.4L-45.0 42.7L-45.0 45.1L-45.0 43.7L-45.0 53.4L-45.0 57.6L-45.0 59.3L-45.0 57.3L-45.0 52.4L-45.0 51.2L-45.0 52.2L-45.0 48.3L-45.0 46.8L-45.0 48.6L-45.0 57.9L-45.0 62.7L-45.0 78.0L-45.0 84.5L-45.0 87.6L-45.0 94.1L-45.0 102.2L-45.0 108.8L-45.0 107.4L-45.0 114.1L-45.0 122.0L-45.0 132.6L-45.0 142.1L-45.0 149.9L-45.0 148.6L-45.0 152.3L-45.0 153.4L-45.0 157.1L-45.0 155.5L-45.0 157.4L-45.0 159.3L-45.0 172.0L-45.0 176.5L-45.0 180.0L-45.0 197.9L-45.0 210.1L-45.0 217.4L-45.0 250.7L-45.0 265.1L-45.0 272.1L-45.0 288.4L-45.0 298.4L-45.0 307.7L-45.0 317.3L-45.0 339.9L-45.0 350.5L-45.0 356.8L-45.0 366.8L-45.0 386.2L-45.0 402.3L-45.0 415.9L-45.0 432.3L-45.0 444.4L-45.0 482.5L-45.0 490.1L-45.0 495.9L-45.0 490.5L-45.0 487.6L-45.0 492.3L-45.0 489.4L-45.0 490.8L-45.0 494.6L-45.0 508.4L-45.0 510.2L-45.0 506.3L-45.0 511.0L-45.0 516.1L-45.0 528.3L-45.0 535.9L-45.0 550.0L-45.0 562.7L-45.0 577.6L-45.0 595.5L-45.0 591.1L-45.0 602.4L-45.0 593.5L-45.0 583.9L-45.0 576.8L-45.0 565.9L-45.0 554.8L-45.0 547.4L-45.0 539.5L-45.0 529.1L-45.0 494.1L-45.0 479.4L-45.0 473.2L-45.0 480.8L-45.0 479.8L-45.0 476.9L-45.0 465.5L-45.0 460.4L-45.0 452.7L-45.0 450.6L-45.0 442.4L-45.0 428.5L-45.0 424.2L-45.0 422.3L-45.0 400.3L-45.0 389.0L-45.0 345.1L-45.0 315.0L-45.0 317.9L-45.0 304.8L-45.0 292.4L-45.0 283.2L-45.0 278.0L-45.0 271.6L-45.0 243.0L-45.0 239.2L-45.0 223.2L-45.0 192.9L-45.0 187.4L-45.0 188.9L-45.0 181.4L-45.0 174.3L-45.0 146.4L-45.0 120.9L-45.0 113.2L-45.0 104.1L-45.0 96.4L-45.0 91.9L-45.0 90.7L-45.0 97.6Z"/><path class="map-c map-c--ctx" d="M645.0 902.8L645.0 900.6L645.0 895.5L645.0 896.3L645.0 899.7L645.0 902.8L645.0 894.5L645.0 891.9L645.0 886.3L645.0 876.7L645.0 872.7L645.0 874.3L645.0 867.8L645.0 853.4L645.0 848.6L645.0 851.3L645.0 847.3L645.0 848.8L645.0 855.2L645.0 859.2L645.0 860.8L645.0 860.1L645.0 857.0L645.0 861.6L645.0 870.8L645.0 880.0L645.0 884.4L645.0 899.8L645.0 902.8L645.0 886.5L645.0 879.9L645.0 871.5L645.0 855.1L645.0 831.7L645.0 810.8L645.0 794.4L645.0 787.5L645.0 783.4L645.0 779.0L645.0 771.0L645.0 765.8L645.0 766.7L645.0 761.6L645.0 742.5L645.0 726.0L645.0 726.8L645.0 733.6L645.0 738.5L645.0 740.6L645.0 743.9L645.0 751.2L645.0 763.6L645.0 770.8L645.0 772.0L645.0 774.3L645.0 777.2L645.0 783.6L645.0 790.6L645.0 801.1L645.0 810.2L645.0 811.3L645.0 809.2L645.0 810.4L645.0 820.1L645.0 834.8L645.0 840.7L645.0 848.0L645.0 854.3L645.0 856.6L645.0 851.1L645.0 844.5L645.0 839.7L645.0 838.5L645.0 840.9L645.0 844.5L645.0 859.2L645.0 862.1L645.0 861.2L645.0 854.1L645.0 849.0L645.0 841.5L645.0 826.6L645.0 812.3L645.0 804.5L645.0 796.2L645.0 787.1L645.0 780.7L645.0 777.8L645.0 780.4L645.0 786.6L645.0 791.6L645.0 792.6L645.0 789.2L645.0 771.9L645.0 769.5L645.0 768.2L645.0 769.9L645.0 774.2L645.0 778.8L645.0 783.4L645.0 787.1L645.0 789.8L645.0 794.5L645.0 791.4L645.0 779.2L645.0 769.7L645.0 761.7L645.0 749.3L645.0 742.0L645.0 744.3L645.0 754.8L645.0 758.4L645.0 756.2L645.0 762.2L645.0 764.9L645.0 757.5L645.0 750.9L645.0 736.7L645.0 724.2L645.0 712.9L645.0 704.6L645.0 688.7L645.0 656.5L645.0 632.2L645.0 614.0L645.0 608.0L645.0 611.1L645.0 615.1L645.0 620.7L645.0 624.6L645.0 627.5L645.0 625.6L645.0 622.5L645.0 616.1L645.0 607.7L645.0 600.9L645.0 598.8L645.0 596.5L645.0 600.7L645.0 607.5L645.0 621.7L645.0 623.1L645.0 624.2L645.0 627.7L645.0 634.0L645.0 642.6L645.0 649.3L645.0 652.9L645.0 655.3L645.0 656.1L645.0 657.5L645.0 667.2L645.0 669.6L645.0 673.2L645.0 678.7L645.0 685.6L645.0 688.7L645.0 695.2L645.0 696.3L645.0 691.7L645.0 701.9L645.0 705.4L645.0 709.3L645.0 711.1L645.0 715.9L645.0 726.2L645.0 736.7L645.0 740.0L645.0 736.1L645.0 732.3L645.0 736.1L645.0 738.3L645.0 737.0L645.0 734.0L645.0 739.0L645.0 745.1L645.0 748.3L645.0 750.0L645.0 754.2L645.0 753.0L645.0 756.2L645.0 761.5L645.0 763.2L645.0 767.5L645.0 772.1L645.0 777.1L645.0 780.5L645.0 784.7L645.0 786.2L645.0 789.3L645.0 792.8L645.0 793.9L645.0 787.2L645.0 779.8L645.0 783.9L645.0 791.5L645.0 802.6L645.0 812.1L645.0 820.3L645.0 826.1L645.0 833.4L645.0 838.3L645.0 843.6L645.0 848.0L645.0 846.0L645.0 843.0L645.0 843.9L645.0 847.5L645.0 851.7L645.0 854.7L645.0 857.0L645.0 861.0L645.0 859.6L645.0 862.3L645.0 867.8L645.0 877.3L645.0 884.0L645.0 885.7L645.0 890.6L645.0 892.9L645.0 892.1L645.0 899.5L645.0 902.8L645.0 898.0L645.0 896.5L645.0 895.6L645.0 898.1L645.0 902.8L645.0 894.5L645.0 886.3L645.0 880.6L645.0 878.3L645.0 877.3L645.0 872.5L645.0 865.9L645.0 862.0L645.0 848.5L645.0 844.1L645.0 838.9L645.0 834.0L645.0 828.5L645.0 816.5L645.0 814.3L645.0 812.5L645.0 806.4L645.0 795.4L645.0 786.4L645.0 782.3L645.0 778.9L645.0 771.3L645.0 759.7L645.0 746.6L645.0 733.0L645.0 724.6L645.0 719.3L645.0 715.8L645.0 703.0L645.0 701.0L645.0 697.8L645.0 691.3L645.0 679.4L645.0 676.3L645.0 668.8L645.0 661.4L645.0 657.9L645.0 642.8L645.0 637.7L645.0 630.9L645.0 619.2L645.0 611.6L645.0 607.8L645.0 604.6L645.0 600.4L645.0 595.4L645.0 577.9L645.0 571.8L645.0 568.2L645.0 566.6L645.0 567.5L645.0 564.6L645.0 560.1L645.0 558.6L645.0 554.0L645.0 544.6L645.0 542.1L645.0 534.1L645.0 535.3L645.0 534.1L645.0 535.9L645.0 541.0L645.0 544.4L645.0 547.0L645.0 556.1L645.0 550.6L645.0 542.5L645.0 535.6L645.0 529.2L645.0 525.0L645.0 521.3L645.0 517.4L636.6 510.1L632.4 510.0L626.1 512.7L614.6 520.8L610.6 519.1L606.8 512.6L602.8 504.5L597.3 500.4L585.5 500.8L584.4 501.1L578.7 505.8L576.3 505.3L566.1 493.4L568.0 486.9L570.2 477.3L569.4 469.8L567.7 460.0L563.3 443.1L562.7 438.3L555.6 430.9L554.4 424.7L550.6 416.7L546.9 411.6L546.1 400.2L543.6 396.2L540.5 394.3L529.2 397.6L528.0 397.3L533.3 379.2L533.8 368.7L537.2 357.7L541.1 353.3L542.3 349.6L542.9 342.3L542.1 336.0L539.8 332.8L530.5 325.8L520.4 317.4L518.3 306.7L515.2 304.5L506.4 303.9L506.6 300.9L507.9 292.4L510.0 285.0L516.9 277.0L518.6 271.6L520.7 266.8L536.5 261.1L538.3 259.0L538.4 257.1L537.7 255.2L534.1 252.3L530.5 248.3L528.3 237.5L522.8 220.5L517.7 209.1L516.6 202.4L517.9 194.7L519.8 187.2L519.9 179.8L512.0 139.1L512.6 131.7L514.8 124.3L518.5 118.1L526.6 110.1L536.8 95.5L543.7 76.2L547.3 64.6L550.4 62.0L556.2 61.3L558.5 57.7L559.6 55.6L564.6 53.7L566.3 51.4L565.0 47.5L559.9 40.6L555.9 36.3L559.8 26.8L558.5 14.1L556.0 3.5L559.4 -4.3L564.8 -5.0L570.9 3.5L580.1 7.9L586.8 2.2L589.0 -8.8L593.9 -13.6L600.3 -9.3L611.1 -7.8L620.0 -8.5L626.0 -10.8L628.6 -14.3L631.0 -20.7L635.9 -28.9L641.0 -34.2L645.0 -28.1L645.0 -16.9L645.0 -21.1L645.0 -28.3L645.0 -34.6L645.0 -37.8L645.0 -50.7L645.0 -60.9L645.0 -61.8L645.0 -58.3L635.2 -60.4L616.0 -79.5L603.2 -82.1L594.2 -82.1L591.9 -82.1L601.7 -82.1L603.0 -82.1L603.8 -82.1L598.3 -82.1L593.5 -82.1L568.4 -82.1L539.8 -82.1L566.4 -82.1L585.6 -82.1L589.1 -82.1L597.6 -82.1L604.7 -82.1L610.4 -82.1L629.5 -82.1L645.0 -82.1L637.0 -82.1L635.0 -82.1L636.5 -82.1L645.0 -82.1L634.7 -82.1L606.4 -82.1L597.0 -82.1L590.3 -82.1L611.4 -82.1L613.3 -82.1L610.9 -82.1L607.9 -82.1L589.0 -82.1L586.1 -82.1L597.5 -82.1L606.9 -82.1L622.4 -82.1L627.4 -82.1L638.9 -82.1L642.8 -82.1L645.0 -82.1L645.0 -81.1L645.0 -69.7L645.0 -40.7L645.0 -35.5L645.0 -29.5L645.0 -32.3L645.0 -43.4L645.0 -48.5L645.0 -54.4L645.0 -64.0L645.0 -68.4L645.0 -70.5L645.0 -82.1L645.0 -76.2L645.0 -27.0L645.0 -16.7L645.0 -14.5L645.0 -13.6L645.0 -23.5L645.0 -31.4L645.0 -46.3L645.0 -58.6L645.0 -81.5L645.0 -66.5L645.0 -62.3L645.0 -52.7L645.0 -51.3L645.0 -47.7L645.0 -26.8L645.0 -15.1L645.0 -12.8L645.0 -17.0L645.0 -33.8L645.0 -42.6L645.0 -44.1L645.0 -42.1L645.0 -30.6L645.0 -20.2L645.0 -32.1L645.0 -36.6L645.0 -39.3L645.0 -38.0L645.0 -31.2L645.0 -22.4L645.0 -18.7L645.0 -11.6L645.0 -4.3L645.0 6.1L645.0 31.5L645.0 61.2L645.0 84.6L645.0 82.3L645.0 83.8L645.0 87.0L645.0 99.8L645.0 104.4L645.0 107.5L645.0 110.9L645.0 130.0L645.0 142.5L645.0 178.2L645.0 202.1L645.0 228.9L645.0 242.0L645.0 250.6L645.0 256.5L645.0 262.7L645.0 269.7L645.0 274.3L645.0 278.1L645.0 271.4L645.0 252.5L645.0 246.5L645.0 261.6L645.0 268.1L645.0 282.2L645.0 289.0L645.0 298.9L645.0 310.9L645.0 327.2L645.0 337.3L645.0 342.8L645.0 362.1L645.0 373.0L645.0 393.2L645.0 402.0L645.0 409.4L645.0 414.1L645.0 411.6L645.0 413.7L645.0 418.8L645.0 435.7L645.0 451.7L645.0 481.1L645.0 489.2L645.0 494.2L645.0 506.8L645.0 508.3L645.0 504.0L645.0 481.2L645.0 467.7L645.0 458.3L645.0 451.5L645.0 441.6L645.0 443.5L645.0 447.8L645.0 445.9L645.0 450.7L645.0 458.4L645.0 477.3L645.0 480.7L645.0 487.3L645.0 495.4L645.0 500.7L645.0 534.8L645.0 560.2L645.0 581.9L645.0 600.8L645.0 621.7L645.0 630.7L645.0 650.0L645.0 665.3L645.0 683.6L645.0 692.3L645.0 713.6L645.0 715.9L645.0 704.7L645.0 707.4L645.0 712.5L645.0 727.6L645.0 747.1L645.0 760.7L645.0 768.6L645.0 785.4L645.0 816.1L645.0 831.3L645.0 838.4L645.0 847.8L645.0 862.1L645.0 871.2L645.0 885.7L645.0 902.8L645.0 891.9L645.0 890.8L645.0 902.8L645.0 821.5L645.0 796.4L645.0 715.2L645.0 668.3L645.0 622.5L645.0 602.1L645.0 541.2L645.0 503.1L645.0 417.9L645.0 410.1L645.0 406.0L645.0 373.3L645.0 355.3L645.0 336.5L645.0 312.4L645.0 299.4L645.0 291.9L645.0 283.6L645.0 273.9L645.0 269.5L645.0 266.2L645.0 262.6L645.0 269.9L645.0 266.8L645.0 236.7L645.0 241.3L645.0 235.9L645.0 238.2L645.0 228.0L645.0 217.1L645.0 200.9L645.0 181.4L645.0 168.3L645.0 155.9L645.0 144.2L645.0 129.4L645.0 85.2L645.0 48.7L645.0 27.7L645.0 20.3L645.0 16.8L645.0 -13.1L645.0 -37.9L645.0 -55.0L645.0 -66.0L645.0 -82.1L645.0 -47.2L645.0 -18.3L645.0 -17.3L645.0 -11.4L645.0 2.7L645.0 12.5L645.0 20.5L645.0 30.3L645.0 36.5L645.0 37.6L645.0 36.7L645.0 28.7L645.0 41.1L645.0 53.3L645.0 65.6L645.0 76.6L645.0 75.8L645.0 76.9L645.0 83.3L645.0 73.0L645.0 76.9L645.0 87.7L645.0 92.3L645.0 87.0L645.0 71.8L645.0 73.2L645.0 90.1L645.0 91.4L645.0 110.9L645.0 112.7L645.0 108.9L645.0 99.0L645.0 103.0L645.0 114.8L645.0 120.8L645.0 119.7L645.0 91.3L645.0 80.2L645.0 82.5L645.0 80.7L645.0 72.0L645.0 64.6L645.0 62.8L645.0 63.7L645.0 58.4L645.0 30.9L645.0 25.8L645.0 22.8L645.0 24.4L645.0 31.0L645.0 37.6L645.0 39.6L645.0 38.4L645.0 33.3L645.0 35.0L645.0 30.8L645.0 26.5L645.0 21.8L645.0 15.2L645.0 13.5L645.0 -2.8L645.0 -1.5L645.0 2.9L645.0 16.3L645.0 26.2L645.0 30.5L645.0 35.8L645.0 36.9L645.0 37.6L645.0 29.8L645.0 41.2L645.0 51.5L645.0 47.9L645.0 52.1L645.0 63.9L645.0 67.3L645.0 45.9L645.0 49.5L645.0 62.8L645.0 65.9L645.0 52.6L645.0 51.6L645.0 40.1L645.0 43.7L645.0 72.3L645.0 79.3L645.0 75.5L645.0 57.4L645.0 51.5L645.0 46.0L645.0 51.1L645.0 46.7L645.0 55.6L645.0 52.0L645.0 69.7L645.0 81.7L645.0 102.6L645.0 137.4L645.0 150.6L645.0 167.1L645.0 182.4L645.0 197.9L645.0 210.4L645.0 257.8L645.0 264.9L645.0 282.1L645.0 301.0L645.0 305.8L645.0 313.8L645.0 327.2L645.0 331.1L645.0 340.4L645.0 364.1L645.0 380.9L645.0 426.9L645.0 432.5L645.0 444.7L645.0 453.7L645.0 493.9L645.0 497.6L645.0 516.4L645.0 527.7L645.0 541.0L645.0 554.8L645.0 570.9L645.0 580.0L645.0 601.6L645.0 627.8L645.0 634.2L645.0 657.5L645.0 663.0L645.0 671.5L645.0 686.5L645.0 689.8L645.0 691.8L645.0 706.7L645.0 702.5L645.0 701.1L645.0 709.7L645.0 724.7L645.0 738.2L645.0 778.2L645.0 795.9L645.0 813.3L645.0 816.4L645.0 808.5L645.0 807.3L645.0 810.9L645.0 783.1L645.0 778.8L645.0 768.9L645.0 761.6L645.0 747.9L645.0 746.7L645.0 747.8L645.0 765.1L645.0 768.7L645.0 769.6L645.0 772.8L645.0 782.8L645.0 790.6L645.0 793.8L645.0 799.8L645.0 804.9L645.0 826.6L645.0 836.9L645.0 844.1L645.0 848.6L645.0 849.6L645.0 846.7L645.0 840.8L645.0 824.0L645.0 798.9L645.0 792.0L645.0 793.8L645.0 811.3L645.0 831.1L645.0 842.3L645.0 851.6L645.0 849.9L645.0 845.3L645.0 821.4L645.0 804.4L645.0 780.5L645.0 766.3L645.0 756.1L645.0 745.7L645.0 742.8L645.0 756.7L645.0 760.1L645.0 748.6L645.0 751.5L645.0 758.4L645.0 779.5L645.0 786.4L645.0 812.2L645.0 841.7L645.0 855.7L645.0 861.2L645.0 877.6L645.0 883.3L645.0 898.2L645.0 902.8ZM26.8 611.6L19.5 624.6L-0.4 652.2L5.8 655.8L13.1 657.0L21.6 662.1L29.7 663.1L44.2 658.6L46.7 635.0L47.7 613.6L52.3 613.6L59.2 612.1L63.5 617.7L71.6 623.0L81.2 627.8L95.5 636.0L110.4 641.0L115.3 641.6L131.0 641.0L147.5 641.7L152.1 653.8L160.2 659.5L166.9 667.3L167.3 671.8L158.2 700.0L156.3 709.5L156.0 719.1L159.3 731.0L162.5 737.7L159.9 738.6L117.6 737.3L77.6 735.0L40.5 732.9L4.9 730.9L-29.4 729.0L-45.0 727.2L-45.0 725.4L-45.0 723.7L-45.0 712.0L-45.0 699.8L-45.0 683.9L-45.0 672.9L-45.0 660.5L-36.9 655.7L-15.2 656.4L-6.0 650.4L5.9 635.7L18.4 618.0L22.5 610.5L26.8 611.6Z"/><path class="map-c map-c--ctx" d="M225.4 902.8L229.4 902.8L231.0 902.8L229.3 902.8L233.4 902.8L244.8 902.8L250.4 902.8L253.9 902.8L262.2 902.8L262.9 902.8L259.6 902.8L256.9 902.8L254.8 902.8L253.4 902.8L255.5 902.8L258.5 902.8L262.1 902.8L258.9 902.8L255.4 902.8L252.9 902.8L233.4 902.8L228.7 902.8L218.0 902.8L210.6 902.8L199.8 902.8L182.7 902.8L176.4 902.8L171.8 902.8L158.0 902.8L153.7 902.8L154.5 902.8L159.0 902.8L159.9 902.8L159.1 902.8L157.7 902.8L162.0 902.8L168.5 902.8L165.7 902.8L157.6 902.8L148.5 902.8L145.4 902.8L140.5 902.8L120.2 902.8L106.5 902.8L105.2 902.8L102.6 902.8L96.8 902.8L83.4 902.8L78.0 902.8L56.3 902.8L46.9 902.8L40.2 902.8L36.0 902.8L30.1 902.8L26.0 902.8L20.1 902.8L15.0 902.8L9.7 902.8L1.2 902.8L-4.9 902.8L-9.4 902.8L-13.3 902.8L-14.6 902.8L-17.8 902.8L-22.3 902.8L-27.3 902.8L-32.7 902.8L-36.9 902.8L-40.7 902.8L-45.0 902.8L-45.0 896.1L-45.0 893.7L-45.0 884.5L-45.0 847.2L-45.0 837.9L-45.0 826.6L-45.0 823.5L-45.0 831.4L-45.0 835.9L-45.0 830.9L-45.0 826.6L-45.0 820.2L-45.0 810.7L-45.0 805.9L-45.0 804.2L-45.0 797.6L-45.0 793.3L-45.0 795.8L-45.0 796.8L-45.0 784.0L-45.0 767.4L-45.0 751.8L-45.0 750.1L-45.0 746.8L-45.0 741.0L-45.0 737.1L-45.0 726.8L-45.0 710.8L-45.0 705.0L-45.0 697.4L-45.0 686.7L-45.0 674.8L-45.0 672.2L-45.0 681.3L-45.0 692.9L-45.0 699.9L-45.0 695.5L-45.0 685.1L-45.0 716.4L-45.0 727.6L-45.0 736.0L-45.0 738.8L-45.0 733.7L-45.0 727.1L-45.0 723.7L-45.0 725.4L-45.0 727.2L-29.4 729.0L4.9 730.9L40.5 732.9L77.6 735.0L117.6 737.3L159.9 738.6L162.5 737.7L166.8 732.4L172.0 733.1L178.3 736.4L181.2 738.9L182.4 741.7L183.2 744.9L186.6 745.6L192.8 748.0L201.2 753.7L207.8 759.1L214.0 766.9L216.1 775.7L216.2 785.7L215.8 792.1L216.4 794.8L224.9 841.4L239.2 886.3L244.4 902.8L246.5 902.8L248.2 902.8L243.4 902.8L216.0 902.8L210.8 902.8L202.7 902.8L195.3 902.8L193.6 902.8L194.8 902.8L204.5 902.8L214.4 902.8L217.6 902.8L224.8 902.8L227.5 902.8L228.9 902.8L225.6 902.8L226.9 902.8L223.6 902.8L220.9 902.8L225.4 902.8Z"/><path class="map-c map-c--ctx" d="M1.7 -82.1L-8.1 -82.1L-36.2 -82.1L-23.8 -82.1L-19.7 -82.1L-18.9 -82.1L-21.0 -82.1L-27.0 -82.1L-33.9 -82.1L-45.0 -82.1L-27.0 -82.1L-40.8 -82.1L-45.0 -82.1L-45.0 -75.9L-45.0 -66.9L-45.0 -48.8L-45.0 -39.7L-45.0 -29.7L-45.0 -22.3L-45.0 -20.2L-45.0 -19.3L-45.0 -15.5L-45.0 -4.4L-45.0 7.2L-45.0 21.6L-45.0 26.6L-45.0 43.6L-45.0 62.9L-45.0 81.0L-45.0 100.0L-45.0 112.7L-45.0 117.2L-45.0 115.0L-45.0 97.6L-45.0 93.6L-45.0 88.3L-45.0 83.0L-45.0 80.1L-45.0 79.2L-45.0 77.4L-45.0 62.1L-45.0 49.4L-45.0 44.0L-45.0 20.2L-45.0 9.6L-45.0 -2.0L-45.0 7.4L-45.0 22.3L-45.0 28.5L-45.0 31.6L-45.0 40.3L-45.0 41.9L-45.0 51.0L-45.0 64.3L-45.0 94.1L-45.0 97.3L-45.0 101.3L-45.0 98.7L-45.0 106.9L-45.0 108.3L-45.0 98.9L-45.0 86.5L-45.0 93.3L-45.0 101.3L-45.0 106.5L-45.0 110.0L-45.0 111.8L-45.0 122.2L-45.0 129.2L-45.0 137.1L-45.0 138.3L-45.0 142.0L-45.0 147.0L-45.0 161.4L-45.0 198.3L-45.0 208.7L-45.0 219.5L-45.0 228.4L-45.0 236.5L-45.0 232.9L-45.0 236.1L-45.0 229.7L-45.0 225.4L-45.0 222.9L-45.0 219.8L-45.0 218.8L-45.0 221.3L-45.0 228.2L-45.0 230.0L-45.0 226.1L-45.0 222.5L-45.0 215.3L-45.0 208.7L-45.0 207.4L-45.0 203.4L-45.0 202.7L-45.0 188.1L-45.0 180.2L-45.0 167.8L-45.0 154.5L-45.0 140.0L-45.0 126.8L-45.0 106.0L-45.0 100.8L-45.0 108.1L-45.0 120.3L-45.0 110.2L-45.0 102.5L-45.0 100.3L-45.0 109.2L-45.0 104.3L-45.0 94.3L-45.0 89.2L-45.0 84.1L-45.0 77.1L-45.0 70.6L-45.0 61.7L-45.0 52.2L-45.0 42.7L-45.0 33.4L-45.0 27.8L-45.0 25.9L-45.0 29.5L-45.0 35.6L-45.0 45.9L-45.0 54.2L-45.0 57.5L-45.0 60.2L-45.0 62.8L-45.0 74.7L-45.0 79.8L-45.0 71.6L-45.0 40.5L-45.0 25.4L-45.0 14.7L-45.0 12.9L-45.0 5.0L-45.0 8.7L-45.0 12.2L-45.0 2.2L-45.0 0.7L-45.0 -9.4L-45.0 -11.2L-45.0 -9.0L-45.0 -6.1L-45.0 -7.9L-45.0 -15.5L-45.0 -22.3L-45.0 -38.5L-45.0 -45.6L-45.0 -52.3L-45.0 -56.8L-45.0 -66.1L-45.0 -82.1L-45.0 -63.4L-45.0 -55.1L-45.0 -82.1L-45.0 -73.9L-45.0 -62.3L-45.0 -54.8L-45.0 -43.8L-45.0 -37.8L-45.0 -35.6L-45.0 -21.6L-45.0 -10.3L-45.0 -1.4L-45.0 5.5L-45.0 8.0L-45.0 14.7L-45.0 11.2L-45.0 2.5L-45.0 -11.4L-45.0 -21.5L-45.0 -31.3L-45.0 -40.4L-45.0 -46.2L-45.0 -43.4L-45.0 -51.0L-45.0 -55.3L-45.0 -62.3L-45.0 -76.4L-45.0 -82.1L-39.8 -82.1L-34.0 -82.1L-28.3 -82.1L-20.7 -82.1L-18.4 -82.1L-16.0 -82.1L-20.0 -82.1L-24.2 -82.1L-41.7 -82.1L-40.9 -82.1L-37.0 -82.1L-30.2 -82.1L-8.5 -82.1L10.5 -82.1L4.6 -82.1L-2.8 -82.1L-5.0 -82.1L-4.1 -82.1L1.7 -82.1L18.0 -82.1L27.8 -82.1L32.4 -82.1L42.2 -82.1L49.0 -82.1L62.5 -82.1L74.3 -82.1L88.5 -82.1L99.9 -82.1L103.1 -82.1L96.9 -82.1L90.2 -82.1L75.6 -82.1L60.0 -82.1L56.0 -82.1L56.7 -82.1L70.4 -82.1L88.5 -82.1L104.7 -82.1L109.1 -82.1L121.5 -82.1L129.1 -82.1L133.9 -82.1L136.6 -82.1L156.3 -82.1L168.9 -82.1L175.6 -82.1L178.7 -82.1L183.5 -82.1L193.3 -82.1L199.3 -82.1L206.5 -82.1L210.0 -82.1L203.3 -82.1L201.5 -82.1L204.7 -82.1L208.5 -82.1L229.6 -82.1L247.3 -82.1L257.9 -82.1L276.4 -82.1L281.7 -82.1L286.5 -82.1L285.3 -82.1L275.1 -82.1L288.1 -82.1L304.4 -82.1L312.4 -82.1L317.4 -82.1L333.2 -82.1L342.8 -82.1L349.8 -82.1L354.4 -82.1L358.2 -82.1L362.7 -82.1L372.7 -82.1L378.7 -82.1L383.4 -82.1L387.6 -82.1L388.6 -82.1L379.9 -82.1L365.1 -82.1L350.5 -82.1L345.7 -82.1L341.0 -82.1L329.6 -82.1L328.7 -82.1L333.3 -82.1L345.9 -82.1L361.4 -82.1L365.3 -82.1L404.1 -82.1L422.3 -82.1L443.0 -82.1L454.6 -82.1L460.0 -82.1L455.7 -82.1L446.9 -82.1L453.3 -82.1L452.1 -82.1L450.1 -82.1L448.8 -82.1L455.0 -82.1L479.2 -82.1L485.3 -82.1L491.0 -82.1L493.8 -82.1L503.2 -82.1L521.0 -82.1L500.2 -82.1L497.6 -82.1L504.9 -82.1L524.8 -82.1L535.0 -82.1L541.1 -82.1L565.6 -82.1L584.4 -82.1L583.7 -82.1L579.5 -82.1L575.4 -82.1L551.3 -82.1L547.4 -82.1L554.9 -82.1L571.2 -82.1L575.4 -82.1L570.2 -82.1L569.3 -82.1L567.5 -82.1L569.5 -82.1L576.0 -82.1L578.2 -82.1L587.8 -82.1L591.4 -82.1L600.7 -82.1L611.2 -82.1L617.4 -82.1L637.7 -82.1L645.0 -82.1L613.6 -82.1L615.3 -82.1L645.0 -82.1L642.8 -82.1L638.9 -82.1L627.4 -82.1L621.9 -82.1L617.4 -82.1L618.5 -82.1L631.9 -82.1L644.4 -82.1L640.6 -82.1L615.0 -82.1L585.9 -82.1L575.2 -82.1L558.5 -82.1L546.7 -82.1L536.1 -82.1L524.4 -82.1L506.1 -82.1L495.4 -82.1L489.6 -82.1L488.2 -82.1L475.1 -82.1L460.5 -82.1L448.8 -82.1L444.4 -82.1L428.1 -82.1L416.7 -82.1L410.4 -82.1L405.9 -82.1L402.1 -82.1L393.8 -82.1L387.5 -82.1L386.1 -82.1L387.6 -82.1L386.1 -82.1L378.5 -82.1L373.1 -82.1L366.1 -82.1L356.8 -82.1L348.7 -82.1L343.0 -82.1L336.5 -82.1L325.6 -82.1L315.2 -82.1L307.7 -82.1L291.8 -82.1L279.9 -82.1L266.6 -82.1L254.8 -82.1L244.1 -82.1L237.9 -82.1L233.0 -82.1L214.7 -82.1L204.3 -82.1L190.8 -82.1L185.4 -82.1L165.8 -82.1L142.6 -82.1L135.8 -82.1L133.7 -82.1L127.5 -82.1L111.0 -82.1L104.2 -82.1L91.5 -82.1L76.6 -82.1L74.5 -82.1L64.6 -82.1L50.0 -82.1L40.8 -82.1L35.0 -82.1L33.9 -82.1L39.6 -82.1L37.8 -82.1L34.9 -82.1L21.7 -82.1L5.7 -82.1L1.7 -82.1Z"/><path class="map-c map-c--ctx" d="M-45.0 -82.1L-43.5 -82.1L-42.5 -82.1L-38.4 -82.1L-32.4 -77.2L-31.2 -74.4L-27.0 -72.9L-25.6 -69.9L-30.4 -60.7L-33.4 -60.5L-35.6 -61.7L-39.5 -60.7L-41.8 -58.9L-42.6 -55.1L-42.5 -47.0L-45.0 -45.4L-45.0 -47.7L-45.0 -66.1L-45.0 -70.8L-45.0 -72.8L-45.0 -63.4L-45.0 -64.4L-45.0 -70.9L-45.0 -75.5L-45.0 -77.8L-45.0 -79.6L-45.0 -82.1ZM0.8 -39.8L0.3 -36.5L-5.9 -35.8L-8.4 -38.7L-14.2 -38.3L-15.2 -39.8L-12.8 -42.6L-8.2 -44.4L-2.3 -43.7L0.8 -39.8Z"/><path class="map-c map-c--ctx" d="M266.7 -82.1L258.7 -82.1L254.6 -82.1L248.0 -82.1L236.4 -82.1L234.1 -82.1L232.5 -82.1L230.5 -82.1L232.6 -82.1L237.6 -82.1L244.9 -82.1L246.4 -82.1L250.4 -82.1L254.1 -82.1L253.2 -82.1L250.6 -82.1L245.2 -82.1L236.9 -82.1L230.8 -82.1L228.1 -82.1L226.7 -82.1L229.2 -82.1L237.1 -82.1L238.1 -82.1L235.0 -82.1L229.6 -82.1L220.3 -82.1L215.1 -82.1L214.1 -82.1L214.9 -82.1L217.8 -82.1L220.3 -82.1L217.5 -82.1L216.6 -82.1L217.6 -82.1L227.5 -82.1L215.6 -82.1L206.7 -82.1L203.9 -82.1L193.7 -82.1L187.3 -82.1L178.2 -82.1L169.1 -82.1L163.7 -82.1L132.2 -82.1L119.6 -82.1L104.8 -82.1L93.8 -82.1L84.3 -82.1L76.2 -82.1L64.9 -82.1L61.7 -82.1L49.5 -82.1L43.8 -82.1L23.9 -82.1L23.2 -82.1L22.1 -82.1L1.7 -82.1L5.7 -82.1L21.7 -82.1L34.9 -82.1L37.8 -82.1L39.6 -82.1L33.9 -82.1L35.0 -82.1L40.8 -82.1L50.0 -82.1L64.6 -82.1L74.5 -82.1L76.6 -82.1L91.5 -82.1L104.2 -82.1L111.0 -82.1L127.5 -82.1L133.7 -82.1L135.8 -82.1L142.6 -82.1L165.8 -82.1L185.4 -82.1L190.8 -82.1L204.3 -82.1L214.7 -82.1L233.0 -82.1L237.9 -82.1L244.1 -82.1L254.8 -82.1L266.6 -82.1L279.9 -82.1L291.8 -82.1L307.7 -82.1L315.2 -82.1L325.6 -82.1L336.5 -82.1L343.0 -82.1L348.7 -82.1L356.8 -82.1L366.1 -82.1L373.1 -82.1L378.5 -82.1L386.1 -82.1L387.6 -82.1L386.1 -82.1L387.5 -82.1L393.8 -82.1L402.1 -82.1L405.9 -82.1L410.4 -82.1L416.7 -82.1L428.1 -82.1L444.4 -82.1L448.8 -82.1L460.5 -82.1L475.1 -82.1L488.2 -82.1L489.6 -82.1L495.4 -82.1L506.1 -82.1L524.4 -82.1L536.1 -82.1L546.7 -82.1L558.5 -82.1L575.2 -82.1L585.9 -82.1L615.0 -82.1L640.6 -82.1L645.0 -82.1L631.9 -82.1L618.5 -82.1L617.4 -82.1L621.9 -82.1L627.4 -82.1L622.4 -82.1L606.9 -82.1L597.5 -82.1L586.1 -82.1L589.0 -82.1L607.9 -82.1L610.9 -82.1L613.0 -82.1L611.4 -82.1L590.9 -82.1L597.0 -82.1L606.4 -82.1L634.7 -82.1L645.0 -82.1L636.5 -82.1L635.2 -82.1L637.0 -82.1L645.0 -82.1L629.5 -82.1L610.4 -82.1L604.7 -82.1L597.6 -82.1L589.1 -82.1L585.6 -82.1L566.4 -82.1L539.8 -82.1L537.1 -82.1L530.2 -82.1L519.4 -82.1L514.7 -82.1L498.1 -82.1L495.4 -82.1L485.7 -82.1L476.3 -82.1L459.1 -82.1L450.6 -82.1L445.1 -82.1L444.0 -82.1L446.3 -82.1L450.1 -82.1L447.7 -82.1L442.2 -82.1L439.2 -82.1L433.3 -82.1L420.4 -82.1L407.7 -82.1L401.7 -82.1L405.5 -82.1L408.0 -82.1L407.7 -80.9L400.9 -81.6L393.4 -77.2L386.9 -70.8L383.7 -70.8L379.2 -79.8L371.1 -75.6L364.2 -69.9L350.1 -68.2L341.7 -60.7L326.8 -55.7L318.7 -55.9L300.0 -49.8L293.8 -40.5L288.4 -37.1L280.7 -40.0L256.9 -35.5L234.1 -29.5L224.5 -29.8L214.8 -32.3L204.5 -24.0L193.6 -13.0L181.6 -9.0L177.3 -10.4L180.7 -16.3L188.7 -22.3L194.1 -30.4L194.9 -37.2L191.1 -39.8L186.0 -40.7L179.6 -47.7L173.4 -62.9L170.0 -63.7L168.3 -59.7L166.4 -48.1L164.5 -44.7L161.2 -42.0L157.3 -39.3L153.5 -38.0L139.7 -38.2L137.9 -44.1L137.9 -46.5L140.3 -54.3L138.2 -55.7L140.2 -61.7L143.5 -61.4L147.3 -62.3L149.2 -65.4L149.1 -69.2L143.8 -70.1L143.4 -72.7L148.2 -82.1L147.0 -82.1L144.0 -82.1L124.3 -82.1L100.0 -82.1L94.1 -82.1L90.4 -82.1L84.5 -82.1L76.0 -82.1L69.6 -82.1L62.7 -82.1L60.8 -82.1L58.4 -82.1L57.0 -82.1L58.3 -82.1L63.8 -82.1L65.9 -82.1L68.5 -82.1L67.6 -82.1L72.4 -82.1L71.4 -82.1L69.5 -82.1L67.4 -82.1L69.2 -82.1L74.4 -82.1L75.4 -82.1L71.4 -82.1L65.3 -82.1L58.9 -82.1L49.2 -82.1L52.6 -82.1L56.5 -82.1L55.8 -82.1L54.3 -82.1L42.4 -82.1L40.7 -82.1L37.8 -82.1L38.9 -82.1L40.8 -82.1L44.7 -82.1L64.3 -82.1L65.5 -82.1L78.8 -82.1L72.6 -82.1L71.2 -82.1L90.0 -82.1L97.2 -82.1L114.0 -82.1L129.0 -82.1L126.4 -82.1L123.2 -82.1L125.5 -82.1L130.9 -82.1L128.4 -82.1L134.9 -82.1L144.6 -82.1L161.7 -82.1L181.1 -82.1L190.0 -82.1L198.7 -82.1L217.0 -82.1L224.9 -82.1L229.0 -82.1L244.6 -82.1L249.4 -82.1L256.7 -82.1L275.9 -82.1L288.0 -82.1L294.8 -82.1L296.8 -82.1L304.3 -82.1L311.1 -82.1L325.7 -82.1L340.1 -82.1L346.1 -82.1L351.6 -82.1L347.1 -82.1L350.3 -82.1L357.9 -82.1L357.2 -82.1L355.5 -82.1L349.2 -82.1L352.3 -82.1L353.1 -82.1L356.1 -82.1L348.1 -82.1L318.0 -82.1L312.3 -82.1L305.6 -82.1L298.6 -82.1L301.7 -82.1L299.4 -82.1L294.9 -82.1L285.3 -82.1L272.8 -82.1L266.7 -82.1ZM104.6 -80.2L99.1 -79.6L91.4 -82.1L90.4 -82.1L93.4 -82.1L91.5 -82.1L98.0 -82.1L101.3 -82.1L98.1 -82.1L103.5 -82.1L104.6 -80.2ZM118.1 -82.1L127.6 -81.7L131.6 -82.1L136.2 -75.7L128.5 -71.1L127.9 -65.5L131.0 -61.9L132.0 -56.8L124.4 -56.9L120.7 -61.1L119.1 -66.6L115.5 -70.4L110.8 -73.4L113.1 -77.3L114.4 -82.1L118.1 -82.1ZM92.5 -53.4L85.0 -48.7L82.1 -49.8L82.9 -57.8L87.3 -61.4L94.8 -61.8L92.5 -53.4ZM77.1 -48.9L70.5 -47.6L66.5 -51.5L68.0 -54.5L72.6 -57.8L77.6 -57.3L78.6 -53.5L77.1 -48.9Z"/><path class="map-c map-c--ctx" d="M645.0 902.8L643.1 902.8L640.2 902.8L637.7 902.8L634.6 902.8L631.0 902.8L628.3 902.8L624.6 902.8L618.7 902.8L614.5 902.8L609.8 902.8L606.8 902.8L603.6 902.8L599.9 902.8L594.9 902.8L586.8 902.8L576.9 902.8L568.8 902.8L565.8 902.8L561.0 902.8L555.8 902.8L544.4 902.8L542.2 902.8L539.2 902.8L535.6 902.8L532.5 902.8L530.8 902.8L531.7 902.8L525.1 902.8L513.9 902.8L506.1 902.8L502.2 902.8L500.3 902.8L490.6 902.8L485.6 902.8L476.5 902.8L463.0 902.8L447.5 902.8L439.0 902.8L434.6 902.8L425.0 902.8L399.4 902.8L388.9 902.8L373.5 902.8L350.0 902.8L335.0 902.8L328.0 902.8L320.0 902.8L306.4 902.8L300.8 902.8L292.1 902.8L282.1 902.8L279.3 902.8L276.0 902.8L264.5 902.8L253.4 902.8L251.3 902.8L244.8 902.8L239.4 902.8L233.0 902.8L228.5 902.8L225.6 902.8L220.5 902.8L223.6 902.8L226.9 902.8L225.6 902.8L228.8 902.8L227.5 902.8L224.8 902.8L217.6 902.8L214.4 902.8L204.5 902.8L194.8 902.8L193.1 902.8L195.3 902.8L202.7 902.8L210.8 902.8L216.0 902.8L243.4 902.8L247.6 902.8L248.7 902.8L246.5 902.8L244.4 902.8L239.2 886.3L224.9 841.4L216.4 794.8L221.9 797.5L235.0 798.5L245.4 795.3L250.8 794.9L255.6 795.9L262.8 794.1L269.3 793.3L272.7 797.5L278.8 801.2L290.9 795.9L301.6 789.3L312.6 790.0L314.2 786.8L316.9 770.3L320.2 766.7L333.5 768.3L338.4 765.3L343.5 757.2L351.3 752.2L357.8 752.2L364.6 746.5L367.9 750.3L369.6 757.1L367.3 762.6L368.3 764.7L373.0 767.4L381.0 767.3L386.2 765.1L387.4 761.9L387.4 756.3L386.1 751.0L382.7 746.5L376.3 744.1L371.8 744.0L371.1 741.1L372.6 735.0L376.5 723.6L381.4 713.2L384.4 709.3L384.9 705.8L384.3 699.5L384.2 688.3L388.6 672.6L394.4 660.8L402.3 657.0L412.0 654.9L418.1 649.3L421.2 642.9L422.3 637.4L423.8 632.7L426.9 630.6L450.1 631.9L453.6 621.8L455.6 619.0L460.1 616.0L463.2 612.4L462.0 609.6L456.1 607.8L442.1 606.2L439.3 602.9L440.2 598.9L443.9 588.4L447.5 575.0L449.3 564.6L449.5 558.4L451.5 556.8L462.9 554.8L466.7 552.7L476.5 538.5L483.9 536.1L503.2 539.8L512.0 539.5L514.4 539.8L523.3 540.5L524.2 539.1L528.2 525.0L532.1 521.0L547.2 502.5L557.4 494.7L563.8 493.0L566.1 493.4L576.3 505.3L578.7 505.8L584.4 501.1L585.5 500.8L597.3 500.4L602.8 504.5L606.8 512.6L610.6 519.1L614.6 520.8L626.1 512.7L632.4 510.0L636.6 510.1L645.0 517.4L645.0 521.3L645.0 525.0L645.0 529.2L645.0 535.6L645.0 542.5L645.0 550.6L645.0 556.1L645.0 547.0L645.0 544.5L645.0 541.0L645.0 535.9L645.0 534.1L645.0 535.3L645.0 534.1L645.0 542.1L645.0 544.6L645.0 554.0L645.0 558.6L645.0 560.1L645.0 564.6L645.0 567.5L645.0 566.6L645.0 568.2L645.0 571.8L645.0 577.9L645.0 595.4L645.0 600.4L645.0 604.6L645.0 607.8L645.0 611.6L645.0 619.2L645.0 630.9L645.0 637.7L645.0 642.8L645.0 657.9L645.0 661.4L645.0 668.8L645.0 676.3L645.0 679.4L645.0 691.3L645.0 697.8L645.0 701.0L645.0 703.0L645.0 715.8L645.0 719.3L645.0 724.6L645.0 733.0L645.0 746.6L645.0 759.7L645.0 771.3L645.0 778.9L645.0 782.3L645.0 786.4L645.0 795.4L645.0 806.4L645.0 812.5L645.0 815.0L645.0 816.5L645.0 828.5L645.0 834.0L645.0 838.9L645.0 844.1L645.0 848.5L645.0 862.0L645.0 865.9L645.0 872.5L645.0 877.3L645.0 878.3L645.0 880.6L645.0 886.3L645.0 894.5L645.0 902.8L645.0 898.1L645.0 895.8L645.0 898.0L645.0 902.8Z"/><path class="map-c map-c--lt" d="M26.8 611.6L22.5 610.5L31.1 594.8L34.3 584.5L36.6 570.0L38.6 565.4L38.7 572.0L37.8 583.0L32.4 601.8L26.8 611.6ZM162.5 737.7L159.3 731.0L156.0 719.1L156.3 709.5L158.2 700.0L167.3 671.8L166.9 667.3L160.2 659.5L152.1 653.8L147.5 641.7L131.0 641.0L115.3 641.6L110.4 641.0L95.5 636.0L81.2 627.8L71.6 623.0L63.5 617.7L59.2 612.1L52.3 613.6L47.7 613.6L47.7 612.6L45.1 602.7L47.8 587.5L42.8 565.2L34.6 538.5L34.0 509.8L33.5 503.4L53.6 487.2L79.0 469.9L84.8 468.4L108.2 458.1L111.3 457.3L132.4 459.2L149.0 461.6L163.0 461.3L170.7 458.7L177.6 460.9L183.2 468.6L189.0 467.7L194.7 462.7L226.0 467.3L233.0 467.2L241.0 467.9L255.6 472.6L264.1 476.8L282.6 474.2L290.5 474.1L294.7 472.4L307.5 460.8L313.0 458.8L318.1 456.7L322.7 458.5L325.8 468.4L335.2 485.5L345.5 488.5L373.9 495.1L379.7 498.6L395.7 513.7L405.3 521.1L411.4 527.1L420.7 538.7L426.1 547.1L435.1 553.5L445.7 557.8L449.5 558.4L449.3 564.6L447.5 575.0L443.9 588.4L440.2 598.9L439.3 602.9L442.1 606.2L456.1 607.8L462.0 609.6L463.2 612.4L460.1 616.0L455.6 619.0L453.6 621.8L450.1 631.9L426.9 630.6L423.8 632.7L422.3 637.4L421.2 642.9L418.1 649.3L412.0 654.9L402.3 657.0L394.4 660.8L388.6 672.6L384.2 688.3L384.3 699.5L384.9 705.8L384.4 709.3L381.4 713.2L376.5 723.6L372.6 735.0L371.1 741.1L371.8 744.0L376.3 744.1L382.7 746.5L386.1 751.0L387.4 756.3L387.4 761.9L386.2 765.1L381.0 767.3L373.0 767.4L368.3 764.7L367.3 762.6L369.6 757.1L367.9 750.3L364.6 746.5L357.8 752.2L351.3 752.2L343.5 757.2L338.4 765.3L333.5 768.3L320.2 766.7L316.9 770.3L314.2 786.8L312.6 790.0L301.6 789.3L290.9 795.9L278.8 801.2L272.7 797.5L269.3 793.3L262.8 794.1L255.6 795.9L250.8 794.9L245.4 795.3L235.0 798.5L221.9 797.5L216.4 794.8L215.8 792.1L216.2 785.7L216.1 775.7L214.0 766.9L207.8 759.1L201.2 753.7L192.8 748.0L186.6 745.6L183.2 744.9L182.4 741.7L181.2 738.9L178.3 736.4L172.0 733.1L166.8 732.4L162.5 737.7Z"><title>Lithuania</title></path><path class="map-c map-c--lv" d="M449.5 558.4L445.7 557.8L435.1 553.5L426.1 547.1L420.7 538.7L411.4 527.1L405.3 521.1L395.7 513.7L379.7 498.6L373.9 495.1L345.5 488.5L335.2 485.5L325.8 468.4L322.7 458.5L318.1 456.7L313.0 458.8L307.5 460.8L294.7 472.4L290.5 474.1L282.6 474.2L264.1 476.8L255.6 472.6L241.0 467.9L233.0 467.2L226.0 467.3L194.7 462.7L189.0 467.7L183.2 468.6L177.6 460.9L170.7 458.7L163.0 461.3L149.0 461.6L132.4 459.2L111.3 457.3L108.2 458.1L84.8 468.4L79.0 469.9L53.6 487.2L33.5 503.4L31.1 477.5L32.4 425.9L35.3 400.3L49.3 385.4L56.3 373.7L60.4 358.2L61.6 343.9L64.4 332.1L84.7 298.1L100.7 294.4L122.4 285.0L146.6 277.1L151.3 287.1L153.6 294.7L182.8 322.5L190.3 331.9L201.5 363.9L228.6 380.1L249.8 375.0L259.1 367.1L276.1 352.6L283.7 342.0L285.2 331.7L282.2 287.9L277.6 268.9L279.2 257.1L282.2 257.7L289.4 252.0L313.2 241.4L317.9 240.9L323.3 238.8L338.3 230.7L343.1 235.0L347.2 239.8L349.4 239.9L350.4 238.1L350.1 235.0L351.2 232.7L355.5 234.0L372.8 247.2L379.5 250.3L384.1 251.2L389.5 257.4L404.3 261.5L406.1 264.7L407.3 268.7L421.1 285.5L427.4 293.9L439.7 301.7L444.9 303.5L466.5 295.6L472.5 292.9L477.5 292.8L482.5 297.0L494.0 302.5L504.5 304.3L506.4 303.9L515.2 304.5L518.3 306.7L520.4 317.4L530.5 325.8L539.8 332.8L542.1 336.0L542.9 342.3L542.3 349.6L541.1 353.3L537.2 357.7L533.8 368.7L533.3 379.2L528.0 397.3L529.2 397.6L540.5 394.3L543.6 396.2L546.1 400.2L546.9 411.6L550.6 416.7L554.4 424.7L555.6 430.9L562.7 438.3L563.3 443.1L567.7 460.0L569.4 469.8L570.2 477.3L568.0 486.9L566.1 493.4L563.8 493.0L557.4 494.7L547.2 502.5L532.1 521.0L528.2 525.0L524.2 539.1L523.3 540.5L514.4 539.8L512.0 539.5L503.2 539.8L483.9 536.1L476.5 538.5L466.7 552.7L462.9 554.8L451.5 556.8L449.5 558.4Z"><title>Latvia</title></path><path class="map-c map-c--ee" d="M506.4 303.9L504.5 304.3L494.0 302.5L482.5 297.0L477.5 292.8L472.5 292.9L466.5 295.6L444.9 303.5L439.7 301.7L427.4 293.9L421.1 285.5L407.3 268.7L406.1 264.7L404.3 261.5L389.5 257.4L384.1 251.2L379.5 250.3L372.8 247.2L355.5 234.0L351.2 232.7L350.1 235.0L350.4 238.1L349.4 239.9L347.2 239.8L343.1 235.0L338.3 230.7L323.3 238.8L317.9 240.9L313.2 241.4L289.4 252.0L282.2 257.7L279.2 257.1L279.9 251.7L289.8 224.9L291.6 203.6L295.2 200.7L296.2 197.7L294.7 190.9L284.4 186.6L280.3 187.2L276.5 194.5L272.7 199.8L263.6 203.0L255.8 197.4L237.6 190.0L233.0 180.1L231.9 170.2L222.2 160.6L218.2 149.3L219.8 141.4L228.6 136.2L231.1 131.7L220.0 132.4L217.8 131.3L217.3 127.3L212.4 113.4L216.7 108.0L218.6 102.7L215.1 98.2L216.0 93.1L218.8 87.9L217.1 75.8L228.0 69.4L238.7 65.0L261.3 62.7L259.0 51.7L268.2 51.2L283.5 37.9L298.8 40.3L320.8 31.2L363.3 31.3L369.1 26.1L368.1 20.8L368.2 15.2L376.2 16.8L389.5 15.8L439.6 26.8L451.9 26.8L468.9 38.1L478.1 40.9L505.2 41.0L546.9 45.9L555.1 38.3L555.9 36.3L559.9 40.6L565.0 47.5L566.3 51.4L564.6 53.7L559.6 55.6L558.5 57.7L556.2 61.3L550.4 62.0L547.3 64.6L543.7 76.2L536.8 95.5L526.6 110.1L518.5 118.1L514.8 124.3L512.6 131.7L512.0 139.1L519.9 179.8L519.8 187.2L517.9 194.7L516.6 202.4L517.7 209.1L522.8 220.5L528.3 237.5L530.5 248.3L534.1 252.3L537.7 255.2L538.4 257.1L538.3 259.0L536.5 261.1L520.7 266.8L518.6 271.6L516.9 277.0L510.0 285.0L507.9 292.4L506.6 300.9L506.4 303.9ZM151.3 154.4L156.6 157.7L161.5 156.7L166.5 154.4L177.3 156.5L202.0 173.2L204.2 177.7L189.5 179.7L186.2 184.9L182.7 188.5L178.5 189.6L171.4 196.8L161.8 203.7L159.8 207.8L142.4 207.1L132.9 209.7L125.2 217.4L122.1 232.3L116.4 243.9L110.7 248.1L104.8 248.8L103.4 244.4L103.9 240.0L116.5 223.6L119.1 218.3L112.8 215.9L107.6 210.2L96.2 203.5L94.1 198.1L96.8 197.7L99.3 196.2L102.4 191.7L103.8 186.5L94.7 171.4L99.3 169.0L105.1 169.6L111.1 174.0L117.6 168.8L120.4 168.1L125.0 169.9L129.6 159.9L140.6 156.6L146.0 153.6L151.3 154.4ZM174.3 126.3L168.1 133.0L164.5 130.3L162.5 127.1L154.6 142.4L145.7 145.0L140.4 142.0L140.9 136.3L135.8 121.3L128.1 116.9L117.1 116.5L109.2 110.3L139.7 106.1L142.8 99.0L149.0 91.5L153.7 90.7L157.7 92.4L158.4 98.2L159.4 100.5L173.2 103.8L178.6 113.6L180.7 125.3L174.3 126.3ZM205.8 164.1L199.5 165.5L184.8 155.8L188.2 149.2L192.4 146.6L205.0 150.7L206.7 160.7L205.8 164.1Z"><title>Estonia</title></path><g class="dc dc--op"><circle cx="318.8" cy="47.9" r="18.5"/><title>GDC Tallinn campus: 31.5 MW</title></g><g class="dc dc--op"><circle cx="262.5" cy="383.0" r="10.4"/><title>Delska Riga LV DC1: 10 MW</title></g><g class="dc dc--build"><circle cx="343.5" cy="679.8" r="7.9"/><title>Telia Vilnius (under construction): 5.7 MW</title></g><g class="dc dc--op"><circle cx="354.0" cy="696.3" r="4.7"/><title>Delska Vilnius LT DC1: 2 MW</title></g><g class="dc dc--gmc"><circle class="dc__pulse" cx="431.2" cy="574.5" r="36.1"/><circle cx="431.2" cy="574.5" r="36.1"/><title>GlobalMind Center: 120 MW (planned)</title></g><text class="map-l" x="342.8" y="51.9"><tspan x="342.8" dy="0">Tallinn · 31.5 MW</tspan></text><text class="map-l" x="278.5" y="387.0"><tspan x="278.5" dy="0">Riga · 10 MW</tspan></text><text class="map-l map-l--end" x="332.7" y="718.0"><tspan x="332.7" dy="0">Vilnius · 2–6 MW</tspan></text><text class="map-l map-l--gmc" x="431.2" y="640.5"><tspan x="431.2" dy="0">GlobalMind Center</tspan><tspan x="431.2" dy="15">120 MW · planned</tspan></text><text class="map-cn" x="360.0" y="150.5"><tspan x="360.0" dy="0">ESTONIA</tspan></text><text class="map-cn" x="405.0" y="396.7"><tspan x="405.0" dy="0">LATVIA</tspan></text><text class="map-cn" x="247.5" y="615.5"><tspan x="247.5" dy="0">LITHUANIA</tspan></text></svg>
+        <figcaption class="map-cap">
+          <strong>Larger than any data center operating in the Baltic states today.</strong>
+          <span>Circle area proportional to power. Existing sites: published figures (GDC, Delska, Telia; 2025–2026), to be verified. GMC position shown at regional scale.</span>
+          <span class="map-legend"><span class="lgi"><i class="lg lg--op"></i>operating</span><span class="lgi"><i class="lg lg--build"></i>under construction</span><span class="lgi"><i class="lg lg--gmc"></i>GlobalMind Center, planned</span></span>
+        </figcaption>
+      </figure>
+      <div class="card why__card reveal">
+        <span class="label" style="color:var(--c-yellow)">Sovereign AI</span>
+        <h3>Compute is the new strategic infrastructure</h3>
+        <p>Training and running AI models takes large, power-hungry data centers. Most of this capacity is still built in the United States. The EU wants enough of it on its own soil, under its own rules.</p>
+        <ul class="why__facts">
+          <li>Data centers used about 415 TWh of electricity in 2024; the IEA expects that to roughly double by 2030.</li>
+          <li>The EU is funding AI Factories and AI Gigafactories (InvestAI, with a €20 bn fund for gigafactories).</li>
+          <li>The EU aims to at least triple its data center capacity within the next five to seven years.</li>
+          <li>The limit is power, not capital: few European sites can deliver 100 MW on a commercial timeline.</li>
+        </ul>
+        <div class="rank">
+          <div class="rank__title">Largest operating data center sites around the Baltic Sea, by published power</div>
+          <ol>
+            <li><span class="rank__n">01</span><span class="rank__name">Meta Luleå<small>SE</small></span><span class="rank__mw">300&nbsp;MW</span><span class="rank__bar"><i style="--w:100.0%"></i></span></li>
+            <li><span class="rank__n">02</span><span class="rank__name">Meta Odense<small>DK</small></span><span class="rank__mw">300&nbsp;MW</span><span class="rank__bar"><i style="--w:100.0%"></i></span></li>
+            <li><span class="rank__n">03</span><span class="rank__name">Google Hamina<small>FI</small></span><span class="rank__mw">200&nbsp;MW</span><span class="rank__bar"><i style="--w:66.7%"></i></span></li>
+            <li><span class="rank__n">04</span><span class="rank__name">Google Fredericia<small>DK</small></span><span class="rank__mw">200&nbsp;MW</span><span class="rank__bar"><i style="--w:66.7%"></i></span></li>
+            <li><span class="rank__n">05</span><span class="rank__name">Bitdeer Tydal<small>NO</small></span><span class="rank__mw">175&nbsp;MW</span><span class="rank__bar"><i style="--w:58.3%"></i></span></li>
+            <li><span class="rank__n">06</span><span class="rank__name">Hetzner Falkenstein<small>DE</small></span><span class="rank__mw">150&nbsp;MW</span><span class="rank__bar"><i style="--w:50.0%"></i></span></li>
+            <li><span class="rank__n">07</span><span class="rank__name">Hetzner Nuremberg<small>DE</small></span><span class="rank__mw">150&nbsp;MW</span><span class="rank__bar"><i style="--w:50.0%"></i></span></li>
+            <li class="is-gmc"><span class="rank__n">—</span><span class="rank__name">GlobalMind Center<small>LT · planned</small></span><span class="rank__mw">120&nbsp;MW</span><span class="rank__bar"><i style="--w:40.0%"></i></span></li>
+            <li><span class="rank__n">08</span><span class="rank__name">Green Mountain Hamar<small>NO</small></span><span class="rank__mw">90&nbsp;MW</span><span class="rank__bar"><i style="--w:30.0%"></i></span></li>
+            <li><span class="rank__n">09</span><span class="rank__name">Lefdal Mine<small>NO</small></span><span class="rank__mw">80&nbsp;MW</span><span class="rank__bar"><i style="--w:26.7%"></i></span></li>
+            <li><span class="rank__n">10</span><span class="rank__name">NTT Frankfurt 1<small>DE</small></span><span class="rank__mw">70&nbsp;MW</span><span class="rank__bar"><i style="--w:23.3%"></i></span></li>
+          </ol>
+          <p class="rank__note">Operating individual sites and campuses in SE, NO, DK, FI, DE, PL, LT, LV, EE; not company totals or cloud regions. GlobalMind Center (planned) shown at its place among them. Published figures; definitions differ (IT load vs. total power). Sources: AI Data Center Index (Jul 2026), Brightlio (Nov 2026), Baxtel (2026). To be verified.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TYPE & COLOUR (hidden) -->
+<section id="typography" class="sections">
+  <div class="wrap split">
+    <h2 class="reveal">Typography and colour</h2>
+    <div>
+      <div class="card reveal">
+        <div class="spec">
+          <span class="k">H1 · Archivo 650<br>≈ 58 px / 1.04</span><span style="font:650 var(--fs-h1)/1.04 var(--f-head);letter-spacing:-.012em">Power at the fence</span>
+          <span class="k">H2 · Archivo 650<br>≈ 38 px / 1.1</span><span style="font:650 var(--fs-h2)/1.1 var(--f-head)">Heat for the town</span>
+          <span class="k">H3 · Archivo 650<br>≈ 34 px / 1.05</span><span style="font:650 var(--fs-h3)/1.05 var(--f-head)">Land ready, risk removed</span>
+          <span class="k">Body · Roboto Flex 400<br>17 px / 1.6</span><span>Large data centers in Lithuania have been held back by a set of well-known problems. At GlobalMind Center the two that cost the most time and risk, power and land, are already solved.</span>
+          <span class="k">Small · Roboto Flex<br>14 px</span><span style="font-size:var(--fs-small)" class="muted">All figures are indicative and subject to grid-connection agreements, permits and technical design.</span>
+          <span class="k">Label · Roboto Mono 500<br>12 px, caps</span><span class="label">Key point 01 · Economy</span>
+        </div>
+        <hr>
+        <p class="meta">All fonts: SIL Open Font License 1.1 (Google Fonts). Free for commercial use, self-hosting allowed. Latin-ext covers Lithuanian diacritics: Elektrinės, Petriškės, Drūkšiai.</p>
+      </div>
+      <div class="swatches reveal" style="margin-top:24px">
+        <div class="sw"><i style="background:var(--c-green)"></i><div>Green<br>#0F3B00<br>dark / text</div></div>
+        <div class="sw"><i style="background:var(--c-red)"></i><div>Red<br>#990000<br>accent on light</div></div>
+        <div class="sw"><i style="background:var(--c-yellow)"></i><div>Yellow<br>#FFBB00<br>accent on dark</div></div>
+        <div class="sw"><i style="background:var(--c-bg);border-bottom:1px solid var(--c-line)"></i><div>Background<br>#F7F7F7</div></div>
+        <div class="sw"><i style="background:var(--c-orn)"></i><div>Ornament<br>#E3E3E3<br>dots, patterns</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- B5: FOUR PROBLEMS — desktop: left = not yet solved, right = solved; title split across halves -->
+<section id="problems" class="sections" aria-labelledby="problems-title">
+  <div class="problems__grid">
+    <span class="label problems__label">Why this project</span>
+    <h2 id="problems-title" class="problems__title reveal"><span class="t1">Four problems.</span> <span class="t2">Two already solved.</span></h2>
+    <p class="problems__intro muted reveal">The issues that have kept large data centers out of Lithuania, and where this site stands on each.</p>
+
+    <div class="col col--open">
+      <article class="pcard reveal">
+        <div class="pcard__text">
+          <span class="status mid">◐ Mitigated</span>
+          <h3>Price &amp; cooling</h3>
+          <p class="muted">Heat goes to the town through the existing heat main. Cool climate and a lake nearby.</p>
+          <span class="chip chip--line">Second revenue line</span>
+        </div>
+        <div class="pcard__img" role="img" aria-label="Image placeholder: price and cooling"><span>Image · Price &amp; cooling</span></div>
+      </article>
+      <article class="pcard reveal">
+        <div class="pcard__text">
+          <span class="status mid">→ Planned</span>
+          <h3>Connectivity</h3>
+          <p class="muted">High-capacity fibre line from Utena planned. The site already has its own fibre channel.</p>
+          <span class="chip chip--line">AI training: latency-tolerant</span>
+        </div>
+        <div class="pcard__img" role="img" aria-label="Image placeholder: connectivity"><span>Image · Connectivity</span></div>
+      </article>
+    </div>
+
+    <div class="col col--solved">
+      <article class="pcard reveal">
+        <div class="pcard__text">
+          <span class="status ok">✓ Solved</span>
+          <h3>Power</h3>
+          <p class="muted">330 kV switchyard directly behind the plot fence. 200+ MW of spare capacity at the node.</p>
+          <span class="chip">120 MW design load</span>
+        </div>
+        <div class="pcard__img" role="img" aria-label="Image placeholder: power"><span>Image · Power</span></div>
+      </article>
+      <article class="pcard reveal">
+        <div class="pcard__text">
+          <span class="status ok">✓ Solved</span>
+          <h3>Land</h3>
+          <p class="muted">4 ha owned, industrial zoning, no residential neighbours, building height up to 230 m.</p>
+          <span class="chip">Owned plot</span>
+        </div>
+        <div class="pcard__img" role="img" aria-label="Image placeholder: land"><span>Image · Land</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- B6: THE SITE -->
+<section id="site" class="sections" aria-labelledby="site-title">
+  <div class="wrap">
+    <div class="site__head">
+      <span class="label">The site</span>
+      <h2 id="site-title" class="reveal">Land ready. Power at the fence.</h2>
+      <p class="muted reveal">An owned industrial plot on the former Ignalina nuclear power plant site, sharing a fence with a 330 kV switchyard.</p>
+    </div>
+    <div class="site__grid">
+      <figure class="card site__schem reveal" style="margin:0">
+        <svg viewBox="0 0 560 460" role="img" aria-labelledby="sch-t sch-d">
+          <title id="sch-t">Site schematic</title>
+          <desc id="sch-d">Schematic, not to scale: the plot shares a fence with the 330 kV switchyard, lies by a lake, about 5 km from the town of Visaginas; a fibre line from Utena is planned.</desc>
+          <!-- lake -->
+          <path class="sch-lake" d="M0 0 H560 V96 C 470 118 400 84 310 104 C 220 124 150 92 70 110 C 40 116 18 112 0 108 Z"/>
+          <path class="sch-wave" d="M60 40 q12 -8 24 0 t24 0 M210 56 q12 -8 24 0 t24 0 M380 34 q12 -8 24 0 t24 0 M470 66 q12 -8 24 0 t24 0"/>
+          <text class="sch-t sch-t--m" x="20" y="28">Lake Drūkšiai</text>
+          <!-- switchyard -->
+          <rect class="sch-yard" x="300" y="150" width="190" height="150" rx="6"/>
+          <path class="sch-yard-l" d="M318 180 H472 M318 215 H472 M318 250 H472 M345 165 V285 M395 165 V285 M445 165 V285"/>
+          <text class="sch-t" x="395" y="322" text-anchor="middle">330 kV switchyard</text>
+          <!-- plot -->
+          <rect class="sch-plot" x="110" y="150" width="190" height="190" rx="6"/>
+          <g clip-path="url(#plotclip)"><path class="sch-hatch" d="M110 170 l20 -20 M110 210 l60 -60 M110 250 l100 -100 M110 290 l140 -140 M110 330 l180 -180 M130 340 l170 -170 M170 340 l130 -130 M210 340 l90 -90 M250 340 l50 -50"/></g>
+          <clipPath id="plotclip"><rect x="110" y="150" width="190" height="190" rx="6"/></clipPath>
+          <text class="sch-t sch-t--big" x="205" y="240" text-anchor="middle">GMC plot</text>
+          <text class="sch-t" x="205" y="262" text-anchor="middle">4 ha · owned</text>
+          <!-- shared fence -->
+          <line class="sch-fence" x1="300" y1="150" x2="300" y2="300"/>
+          <text class="sch-t sch-t--red" x="306" y="140">shared fence</text>
+          <!-- power into the plot -->
+          <path class="sch-power" d="M300 205 H230"/>
+          <!-- town: about 5 km -->
+          <path class="sch-heat" d="M150 340 C 120 380 80 410 30 430"/>
+          <text class="sch-t" x="20" y="452">→ Visaginas · ≈ 5 km</text>
+          <!-- fibre from Utena (planned) -->
+          <path class="sch-fibre" d="M540 440 C 470 420 380 400 290 340"/>
+          <text class="sch-t" x="540" y="452" text-anchor="end">Fibre from Utena · planned</text>
+        </svg>
+        <figcaption>Schematic · not to scale · visualisation<span class="sch-legend"><span><i style="border-color:var(--c-energy)"></i>power</span><span><i style="border-color:var(--c-heat)"></i>heat to town</span><span><i style="border-color:var(--c-yellow)"></i>fibre (planned)</span></span></figcaption>
+      </figure>
+      <div class="feats">
+        <article class="card feat reveal">
+          <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div>
+          <span class="status ok">✓ Solved</span>
+          <h3>Power at the fence</h3>
+          <p>330 kV switchyard directly behind the shared fence. 200+ MW spare at the node; connection request filed with Litgrid; two supply lines requested.</p>
+        </article>
+        <article class="card feat reveal">
+          <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></div>
+          <span class="status ok">✓ Solved</span>
+          <h3>Land owned</h3>
+          <p>4 ha owned by the project company. Industrial zoning, no residential neighbours.</p>
+        </article>
+        <article class="card feat reveal">
+          <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21V5l4-3 4 3v16M8 9h8M8 13h8M8 17h8"/></svg></div>
+          <span class="status ok">✓ Zoning</span>
+          <h3>Room to build up</h3>
+          <p>Buildings up to 230 m are permitted, so a vertical, multi-storey data center fits a compact plot.</p>
+        </article>
+        <article class="card feat reveal">
+          <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/></svg></div>
+          <span class="status ok">✓ Location</span>
+          <h3>A former nuclear site</h3>
+          <p>Industrial zone of the former Ignalina NPP, about 5 km from Visaginas (10 km by road).</p>
+        </article>
+        <article class="card feat reveal">
+          <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 17c2-2 4-2 6 0s4 2 6 0 4-2 6 0M12 2v6"/></svg></div>
+          <span class="status ok">✓ Cooling</span>
+          <h3>By the lake, in a cool climate</h3>
+          <p>Lake Drūkšiai nearby and a cool continental climate: free cooling for much of the year.</p>
+        </article>
+        <article class="card feat reveal">
+          <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h4l2-6 4 12 2-6h4"/></svg></div>
+          <span class="status mid">→ Planned</span>
+          <h3>Connectivity</h3>
+          <p>The site has its own fibre channel today; a high-capacity line from Utena is planned.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- B7: HEAT FOR THE TOWN -->
+<section id="heat" class="sections" data-season="winter" aria-labelledby="heat-title">
+  <div class="wrap">
+    <div class="heat__head">
+      <span class="label">Heat for the town</span>
+      <h2 id="heat-title" class="reveal">Europe's AI, warming a town.</h2>
+      <p class="muted reveal">The servers produce heat all year. Where it goes depends on the season.</p>
+    </div>
+    <div class="season__wrap">
+      <div class="season" role="group" aria-label="Season">
+        <button type="button" data-season="winter" aria-pressed="true">❄ Winter</button>
+        <button type="button" data-season="summer" aria-pressed="false">☀ Summer</button>
+      </div>
+    </div>
+    <figure class="card heat__art reveal" style="margin-left:auto;margin-right:auto">
+      <svg viewBox="0 0 1000 400" role="img" aria-labelledby="heat-svg-t heat-svg-d">
+          <title id="heat-svg-t">Where the heat goes in winter and in summer</title>
+          <desc id="heat-svg-d">Heat from the data center passes a heat exchanger. In winter most of it flows into the district heating of Visaginas. In summer the town needs heat mainly for hot water, and the surplus is released through free cooling to the outside air.</desc>
+          <line class="h-ground" x1="0" y1="330" x2="1000" y2="330"/>
+          <!-- season icons -->
+          <g class="snow" transform="translate(960 40)"><path class="h-line" d="M0 -16 V16 M-14 -8 L14 8 M-14 8 L14 -8"/></g>
+          <g class="sun" transform="translate(960 40)"><circle class="h-line" r="9"/><path class="h-line" d="M0 -18 V-14 M0 14 V18 M-18 0 H-14 M14 0 H18 M-13 -13 l3 3 M10 10 l3 3 M-13 13 l3 -3 M10 -10 l3 -3"/></g>
+          <!-- data center -->
+          <rect class="h-fill" x="60" y="70" width="110" height="260" rx="4"/>
+          <path class="h-thin" d="M60 110 H170 M60 150 H170 M60 190 H170 M60 230 H170 M60 270 H170 M97 70 V330 M133 70 V330"/>
+          <text class="h-t" x="115" y="360" text-anchor="middle">GlobalMind Center</text>
+          <!-- heat exchanger -->
+          <rect class="h-fill" x="186" y="282" width="48" height="48" rx="4"/>
+          <path class="h-thin" d="M196 292 Q 210 306 196 320 M210 292 Q 224 306 210 320"/>
+          <path class="h-line" d="M170 296 H186 M170 316 H186"/>
+          <text class="h-t" x="210" y="270" text-anchor="middle">HX</text>
+          <!-- pipe to town -->
+          <path class="h-pipe" d="M234 306 H960"/>
+          <path class="f-town" d="M234 306 H960"/>
+          <path class="h-thin" d="M672 306 V330 M758 306 V330 M840 306 V330 M922 306 V330" style="opacity:0"/>
+          <text class="h-t" x="800" y="360" text-anchor="middle">District heating · Visaginas</text>
+          <!-- branch to free cooling -->
+          <path class="h-pipe" d="M290 306 V190 H360"/>
+          <path class="f-cool" d="M290 306 V190 H360"/>
+          <!-- dry cooler with fans -->
+          <rect class="h-fill" x="360" y="166" width="150" height="48" rx="4"/>
+          <g transform="translate(398 190)"><circle class="h-thin" r="17" style="opacity:.8"/><path class="h-line fan" d="M0 -14 L4 0 L0 14 L-4 0 Z M-14 0 L0 4 L14 0 L0 -4 Z"/></g>
+          <g transform="translate(472 190)"><circle class="h-thin" r="17" style="opacity:.8"/><path class="h-line fan" d="M0 -14 L4 0 L0 14 L-4 0 Z M-14 0 L0 4 L14 0 L0 -4 Z"/></g>
+          <path class="haze" d="M392 150 q6 -8 0 -16 t0 -16"/>
+          <path class="haze" d="M435 150 q6 -8 0 -16 t0 -16"/>
+          <path class="haze" d="M478 150 q6 -8 0 -16 t0 -16"/>
+          <!-- lake -->
+          <path class="h-lake" d="M470 330 C 490 352 600 356 625 330 Z"/>
+          <path class="h-wave" d="M505 340 q8 -6 16 0 t16 0 M560 342 q8 -6 16 0 t16 0"/>
+          <text class="h-t h-t--top" x="435" y="98" text-anchor="middle">Free cooling · air &amp; lake</text>
+          <!-- town -->
+          <path class="h-fill" d="M640 330 V262 L672 236 L704 262 V330 Z"/>
+          <rect class="hwin" x="654" y="276" width="11" height="13"/><rect class="hwin" x="680" y="276" width="11" height="13"/><rect class="hwin" x="654" y="300" width="11" height="13"/>
+          <path class="h-fill" d="M720 330 V222 H796 V330 Z"/>
+          <rect class="hwin" x="732" y="236" width="11" height="13"/><rect class="hwin" x="752" y="236" width="11" height="13"/><rect class="hwin" x="772" y="236" width="11" height="13"/>
+          <rect class="hwin" x="732" y="260" width="11" height="13"/><rect class="hwin" x="772" y="260" width="11" height="13"/><rect class="hwin" x="752" y="284" width="11" height="13"/>
+          <path class="h-fill" d="M812 330 V270 L840 248 L868 270 V330 Z"/>
+          <rect class="hwin" x="826" y="284" width="11" height="13"/><rect class="hwin" x="846" y="284" width="11" height="13"/>
+          <path class="h-fill" d="M884 330 V206 H960 V330 Z"/>
+          <rect class="hwin" x="896" y="220" width="11" height="13"/><rect class="hwin" x="916" y="220" width="11" height="13"/><rect class="hwin" x="936" y="220" width="11" height="13"/>
+          <rect class="hwin" x="896" y="244" width="11" height="13"/><rect class="hwin" x="936" y="244" width="11" height="13"/>
+          <rect class="hwin" x="896" y="268" width="11" height="13"/><rect class="hwin" x="916" y="268" width="11" height="13"/><rect class="hwin" x="936" y="268" width="11" height="13"/>
+        </svg>
+    </figure>
+    <div class="heat__note muted" aria-live="polite">
+      <p data-s="winter"><strong>Winter.</strong> Liquid cooling carries the heat to a heat exchanger, and most of it flows into the district-heating network of Visaginas, warming homes.</p>
+      <p data-s="summer"><strong>Summer.</strong> The town needs heat mainly for hot water. The surplus is released through free cooling to the outside air; the nearby lake is a further option, subject to permits.</p>
+    </div>
+    <div class="heat__pts">
+        <article class="card feat reveal"><span class="status ok">Social</span><h3>Heat for homes</h3><p>Server heat can displace fuel in the district heating of Visaginas: a local benefit from a global industry.</p></article>
+        <article class="card feat reveal"><span class="status ok">Climate</span><h3>Lower emissions</h3><p>Heat that is reused does not have to be produced by burning fuel.</p></article>
+        <article class="card feat reveal"><span class="status ok">Economy</span><h3>A second revenue line</h3><p>Heat sold to the network adds income next to compute and offsets energy costs.</p></article>
+        <article class="card feat reveal"><span class="status ok">EU</span><h3>Built for EU rules</h3><p>The Energy Efficiency Directive expects large data centers to reuse waste heat; here it is part of the design from day one.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- B8: A SECOND LIFE FOR A NUCLEAR SITE — dark -->
+<section id="legacy" class="sections dark" aria-labelledby="legacy-title">
+  <div class="wrap">
+    <div class="legacy__head">
+      <span class="label" style="color:var(--c-yellow)">A second life</span>
+      <h2 id="legacy-title" class="reveal">Where nuclear power once flowed, <span class="accent">AI will run.</span></h2>
+      <p class="reveal">For a quarter of a century the Ignalina plant powered the country. Its reactors are gone, but the infrastructure around them, and the people, are still here.</p>
+    </div>
+    <ol class="tl reveal" aria-label="Timeline of the site">
+      <li class=""><span class="tl__y">1974</span><span class="tl__t">Construction of the Ignalina nuclear power plant begins; the town of Visaginas is built for its workers.</span></li>
+      <li class=""><span class="tl__y">1983</span><span class="tl__t">Unit 1 starts: one of the most powerful reactors of its time.</span></li>
+      <li class=""><span class="tl__y">1987</span><span class="tl__t">Unit 2 starts. The plant becomes the backbone of the national grid.</span></li>
+      <li class=""><span class="tl__y">2004</span><span class="tl__t">Unit 1 is shut down, as agreed for EU accession.</span></li>
+      <li class=""><span class="tl__y">2009</span><span class="tl__t">Unit 2 is shut down; decommissioning begins. The grid connection stays.</span></li>
+      <li class="is-now"><span class="tl__y">2026</span><span class="tl__t">GlobalMind Center requests a grid connection for a data center on the site.</span></li>
+      <li class="is-next"><span class="tl__y">Next</span><span class="tl__t">Power flows again: into AI compute, with the heat going back to the town.</span></li>
+    </ol>
+    <div class="legacy__sub">What the plant left behind</div>
+    <div class="legacy__grid">
+        <article class="card reveal"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div><h3>The grid</h3><p>330 kV switchyard and lines built to carry thousands of megawatts.</p></article>
+        <article class="card reveal"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 12c0-3 2-5 5-5M21 12c0 3-2 5-5 5"/></svg></div><h3>The heat main</h3><p>A district-heating main that once carried the plant's heat to Visaginas. Its nearest branch is 1.5 km from the plot; from there the main runs about 9 km to the town.</p></article>
+        <article class="card reveal"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h4l2-6 4 12 2-6h4"/></svg></div><h3>The fibre</h3><p>Its own fibre channel on the site, a base for the planned high-capacity line.</p></article>
+        <article class="card reveal"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12"/></svg></div><h3>The land</h3><p>An industrial zone, zoned for heavy infrastructure, away from housing.</p></article>
+        <article class="card reveal"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21 11 3M16 21 13 3M12 7v2M12 13v2M12 19v1"/></svg></div><h3>The access</h3><p>A finished asphalt road runs right onto the plot, with a large paved area next to the territory.</p></article>
+        <article class="card reveal"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M14 20c0-2.5 1.5-4.5 4-4.5s3.5 1.8 3.5 4"/></svg></div><h3>The people</h3><p>A town built by power engineers, with a tradition of technical skills.</p></article>
+    </div>
+    <p class="legacy__note">Historical dates: Ignalina NPP public records; to be verified before go-live.</p>
+  </div>
+</section>
+
+<!-- B10: STATUS & ROADMAP -->
+<section id="status" class="sections" aria-labelledby="status-title">
+  <div class="wrap">
+    <div class="status__head">
+      <span class="label">Status</span>
+      <h2 id="status-title" class="reveal">Where the project stands.</h2>
+      <p class="muted reveal">The hardest steps, land and power, are behind us. The next ones are open to partners.</p>
+    </div>
+    <div class="board">
+      <div class="board__col board__col--done reveal">
+        <div class="board__h"><b>Done</b><span>✓ behind us</span></div>
+          <article class="task"><span class="task__tag">Land</span><h3>Plot secured</h3><p>4 ha owned by the project company, industrial zoning.</p></article>
+          <article class="task"><span class="task__tag">Grid</span><h3>Grid process started</h3><p>Grid-connection consultation requested from Litgrid, November 2026.</p></article>
+          <article class="task"><span class="task__tag">Site</span><h3>Infrastructure in place</h3><p>Switchyard at the fence, asphalt road to the plot, heat main and fibre nearby.</p></article>
+      </div>
+      <div class="board__col board__col--now reveal">
+        <div class="board__h"><b>Now</b><span>● current stage</span></div>
+          <article class="task"><span class="task__tag">Capital</span><h3>Investors and partners</h3><p>Looking for investors, development partners and anchor tenants.</p></article>
+          <article class="task"><span class="task__tag">Design</span><h3>Technical concept</h3><p>To be developed with partners: building type, phasing, liquid cooling and heat recovery.</p></article>
+          <article class="task"><span class="task__tag">Heat</span><h3>Heat supply for the town</h3><p>A concept for feeding server heat into the district heating of Visaginas.</p></article>
+          <article class="task"><span class="task__tag">Funding</span><h3>EU co-financing</h3><p>The project is planned with partial EU co-financing.</p></article>
+          <a class="board__cta" href="#contact">Don't miss the opportunity to join us at this stage <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="board__col board__col--next reveal">
+        <div class="board__h"><b>Next</b><span>○ ahead</span></div>
+          <article class="task"><span class="task__tag">Permits</span><h3>Environmental assessment and permits</h3><p>EIA, building permit, grid-connection agreement.</p></article>
+          <article class="task"><span class="task__tag">Build</span><h3>Construction</h3><p>Phased build-out within the 120 MW envelope.</p></article>
+          <article class="task"><span class="task__tag">Launch</span><h3>Energisation and first heat</h3><p>First compute online; first heat delivered to the town.</p></article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- B11: INVESTMENT OPPORTUNITY -->
+<section id="invest" class="sections" aria-labelledby="invest-title">
+  <div class="wrap">
+    <div class="invest__head">
+      <span class="label">Investment opportunity</span>
+      <h2 id="invest-title" class="reveal">A powered site, open to investors.</h2>
+      <p class="muted reveal">GlobalMind Center offers what AI infrastructure is short of: land with grid power at the fence. We are looking for the partners who will build on it.</p>
+    </div>
+
+    <div class="invest__sub">Ways to work with us</div>
+    <div class="ways">
+      <article class="card way reveal"><span class="chip">Preferred</span><h3>Long-term lease</h3><p>Develop and operate your data center on the powered plot.</p></article>
+      <article class="card way reveal"><span class="chip">Preferred</span><h3>Joint venture</h3><p>Build the project together with the site owner and share the upside.</p></article>
+      <article class="card way reveal"><span class="chip chip--line">Negotiable</span><h3>Purchase</h3><p>Acquisition of the plot is possible, subject to negotiation.</p></article>
+    </div>
+
+    <div class="invest__two">
+      <div>
+        <div class="invest__sub">What you get</div>
+        <ul class="gets">
+          <li class="reveal"><i>1</i><div><b>A de-risked entry</b><span>Land and grid power, the two hardest risks, are already solved.</span></div></li>
+          <li class="reveal"><i>2</i><div><b>Speed to market</b><span>No years in a grid queue: move straight to design and permits.</span></div></li>
+          <li class="reveal"><i>3</i><div><b>Room to grow</b><span>200+ MW of spare capacity at the node, against a 120 MW design basis.</span></div></li>
+          <li class="reveal"><i>4</i><div><b>Two revenue lines</b><span>Compute capacity and heat for the town's district heating.</span></div></li>
+          <li class="reveal"><i>5</i><div><b>EU fit</b><span>Sovereign AI capacity and waste-heat reuse; partial EU co-financing planned.</span></div></li>
+        </ul>
+      </div>
+      <div>
+        <div class="invest__sub">Who we are looking for</div>
+        <div class="card whom reveal">
+          <ul>
+            <li>Infrastructure and DC investors</li>
+            <li>Data center developers and operators</li>
+            <li>AI clouds and labs as anchor tenants</li>
+            <li>Hyperscalers</li>
+            <li>Energy partners</li>
+            <li>Public and EU co-funding partners</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="invest__cta">
+      <a class="pill pill--primary" href="#contact">Request investor materials</a>
+      <a class="pill pill--ghost" href="faq.html">Read the FAQ →</a>
+    </div>
+  </div>
+</section>
+
+<!-- B14 FOOTER with CTA -->
+<section id="contact" class="sections dark">
+  <div class="wrap">
+    <div class="split">
+      <h2 class="reveal">Build Europe's AI capacity <span class="accent">where the power already is.</span></h2>
+      <div class="card reveal">
+        <span class="label" style="color:var(--c-yellow)">Investment opportunity</span>
+        <p style="margin-top:14px;font-size:1.125rem">A powered plot, open to investors and developers. Contact us for the investor materials.</p>
+        <a class="pill pill--accent" href="mailto:info@globalmind.center">info@globalmind.center</a>
+      </div>
+    </div>
+    <div class="foot">
+      <span>GLOBALMIND CENTER, UAB · Visaginas, Lithuania</span>
+      <span>Figures indicative · not an offer of securities · © 2026</span>
+    </div>
+  </div>
+</section>
+
+<script>
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('is-in');io.unobserve(e.target)}}),{threshold:.15});
+  // B7 season switch
+  document.querySelectorAll('#heat .season button').forEach(b=>b.addEventListener('click',()=>{
+    const sec=document.getElementById('heat'); sec.dataset.season=b.dataset.season;
+    sec.querySelectorAll('.season button').forEach(x=>x.setAttribute('aria-pressed', x===b ? 'true' : 'false'));
+  }));
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  // B2 count-up (skipped under reduced motion; final numbers are already in the HTML)
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const run=el=>{const to=parseFloat(el.dataset.count),dec=+(el.dataset.dec||0),t0=performance.now(),d=1400;
+      const step=t=>{const k=Math.min(1,(t-t0)/d),e=1-Math.pow(1-k,3);el.textContent=(to*e).toFixed(dec)+(el.dataset.suffix||'');if(k<1)requestAnimationFrame(step)};
+      requestAnimationFrame(step)};
+    const cio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('[data-count]').forEach(run);cio.unobserve(e.target)}}),{threshold:.4});
+    document.querySelectorAll('.figures').forEach(el=>cio.observe(el));
+  }</script>
+</body>
+</html>
